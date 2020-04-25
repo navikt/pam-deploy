@@ -1,0 +1,38 @@
+name: tag-and-release
+on:
+  push:
+    paths-ignore:
+      - "**.md"
+      - ".gitignore"
+      - "LICENCE"
+      - "CODEOWNERS"
+    branches:
+      - master
+jobs:
+  tag-and-release:
+    name: Tag/Release the github actions
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: push tag version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git remote set-url origin "https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git tag -f $(cat actions/version)
+          git push -f --tags
+  test-action:
+    name: Test the actions
+    needs: tag-and-release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: navikt/pam-deploy/actions/pre-deploy@v1
+      - name: test pre-deploy
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: disply variables
+        run: |
+          echo $VERSION_TAG
+          echo $IMAGE
+          echo $APPLICATION

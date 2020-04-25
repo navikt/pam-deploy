@@ -1,0 +1,5 @@
+name: 'Arbeidsplassen pre-deploy action'
+description: 'Prepare/Check before deploy and release'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
