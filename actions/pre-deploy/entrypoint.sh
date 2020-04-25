@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-
+set -e
 DRAFTS=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "https://api.github.com/repos/$GITHUB_REPOSITORY/releases?per_page=20" | jq -r '. | map(select(.draft == true)) | length')
 if [[ "$DRAFTS" -gt "10" ]]; then
   echo "you have too many release drafts in queue, please release to production or clean up drafts!"
