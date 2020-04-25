@@ -1,0 +1,5 @@
+name: 'Arbeidsplassen post-production action'
+description: 'After a successful deployment to production, do some steps'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
