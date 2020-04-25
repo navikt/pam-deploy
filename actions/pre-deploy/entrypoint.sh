@@ -13,4 +13,4 @@ fi
 IMAGE=$DOCKER_IMAGE:$VERSION_TAG
 echo "::set-env name=VERSION_TAG::$VERSION_TAG"
 echo "::set-env name=APPLICATION::$APPLICATION"
-echo "::set-env name=IMAGE:$IMAGE"
+echo "::set-env name=IMAGE::$IMAGE"
