@@ -27,11 +27,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - uses: navikt/pam-deploy/actions/pre-deploy@v1
       - name: test pre-deploy
+        uses: navikt/pam-deploy/actions/pre-deploy@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: disply variables
+      - name: display variables
         run: |
           echo $VERSION_TAG
           echo $IMAGE
