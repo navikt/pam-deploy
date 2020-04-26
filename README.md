@@ -10,7 +10,7 @@ produce a changelog and create a github release draft. This can then be "publish
 the deploy to production github action.
 
 An example that follow this release workflow and uses pam-deploy actions can be seen 
-[here](https://github.com/navikt/pam-import-api/.github/workflows)
+[here](https://github.com/navikt/pam-import-api/tree/master/.github/workflows)
 
 
 
