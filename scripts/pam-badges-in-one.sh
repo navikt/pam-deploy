@@ -14,10 +14,12 @@ count=0
 
 for name in "${names[@]}"
 do
-   count=`expr $count + 1`
-   remainder=`expr $count % 4`
-   printf "| $name ![build-deploy-dev](https://github.com/navikt/$name/workflows/build-deploy-dev/badge.svg) ![deploy-prod](https://github.com/navikt/$name/workflows/deploy-prod/badge.svg) " >> index.md
-   if [ "$remainder" == "0" ]; then
-     printf "|\n" >> index.md
-  fi
+   if [ "$name" != "pam-scripts" ]; then
+      count=`expr $count + 1`
+      remainder=`expr $count % 4`
+      printf "| $name ![build-deploy-dev](https://github.com/navikt/$name/workflows/build-deploy-dev/badge.svg) ![deploy-prod](https://github.com/navikt/$name/workflows/deploy-prod/badge.svg) " >> index.md
+      if [ "$remainder" == "0" ]; then
+        printf "|\n" >> index.md
+      fi
+   fi
 done
