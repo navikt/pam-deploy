@@ -5,6 +5,8 @@ if [ -n "$GITHUB_WORKSPACE" ]; then
   cd "$GITHUB_WORKSPACE" || exit
 fi
 
+LATEST_TAG=$(git describe --abbrev=0 --tags)
+
 if [ -z "$DRY_RUN" ]; then
    git remote set-url origin "https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
    git tag -f $VERSION_TAG
@@ -12,7 +14,7 @@ if [ -z "$DRY_RUN" ]; then
 fi
 
 LATEST_RELEASE=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "https://api.github.com/repos/$GITHUB_REPOSITORY/releases/latest" | jq -r '.tag_name')
-if [ "$LATEST_RELEASE" = "null" ]; then LATEST_RELEASE=$(git describe --abbrev=0 --tags); fi
+if [ "$LATEST_RELEASE" = "null" ]; then LATEST_RELEASE=$LATEST_TAG; fi
 echo "Found latest release: $LATEST_RELEASE"
 GIT_TREE="[$VERSION_TAG](https://github.com/$GITHUB_REPOSITORY/tree/$VERSION_TAG)"
 COMPARE_LINK="[Full Changelog](https://github.com/$GITHUB_REPOSITORY/compare/$LATEST_RELEASE...$VERSION_TAG)"
