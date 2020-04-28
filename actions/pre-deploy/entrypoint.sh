@@ -6,7 +6,7 @@ if [[ "$DRAFTS" -gt "10" ]]; then
   exit 1
 fi
 APPLICATION=$(echo $GITHUB_REPOSITORY | cut -d "/" -f 2)
-VERSION_TAG=$(date +"%y.%j.%H%M%S")
+VERSION_TAG=$(TZ=Europe/Oslo date +"%y.%j.%H%M%S")
 if [ -z "$DOCKER_IMAGE" ]; then
   DOCKER_IMAGE=docker.pkg.github.com/$GITHUB_REPOSITORY/$APPLICATION
 fi
