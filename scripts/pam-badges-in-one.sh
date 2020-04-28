@@ -17,7 +17,7 @@ do
    if [ "$name" != "pam-scripts" ]; then
       count=`expr $count + 1`
       remainder=`expr $count % 4`
-      printf "| $name ![build-deploy-dev](https://github.com/navikt/$name/workflows/build-deploy-dev/badge.svg) ![deploy-prod](https://github.com/navikt/$name/workflows/deploy-prod/badge.svg) " >> index.md
+      printf "| [$name](https://github.com/navikt/$name/actions) [![build-deploy-dev](https://github.com/navikt/$name/workflows/build-deploy-dev/badge.svg)](https://github.com/navikt/$name/releases) [![deploy-prod](https://github.com/navikt/$name/workflows/deploy-prod/badge.svg)](https://github.com/navikt/$name/releases/latest) " >> index.md
       if [ "$remainder" == "0" ]; then
         printf "|\n" >> index.md
       fi
