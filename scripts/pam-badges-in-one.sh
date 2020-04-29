@@ -27,7 +27,7 @@ do
       echo "found project $name"
       count=`expr $count + 1`
       remainder=`expr $count % 4`
-      printf "| [$name](https://github.com/navikt/$name/actions) [![build-deploy-dev](https://github.com/navikt/$name/workflows/build-deploy-dev/badge.svg)](https://github.com/navikt/$name/releases) [![deploy-prod](https://github.com/navikt/$name/workflows/deploy-prod/badge.svg)](https://github.com/navikt/$name/releases/latest) " >> $FILE
+      printf "| [$name](https://github.com/navikt/$name/actions) <br/> [![build-deploy-dev](https://github.com/navikt/$name/workflows/build-deploy-dev/badge.svg)](https://github.com/navikt/$name/releases) [![deploy-prod](https://github.com/navikt/$name/workflows/deploy-prod/badge.svg)](https://github.com/navikt/$name/releases/latest) " >> $FILE
       if [ "$remainder" == "0" ]; then
         printf "|\n" >> $FILE
       fi
