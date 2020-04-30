@@ -5,6 +5,12 @@ if [ -n "$GITHUB_WORKSPACE" ]; then
   cd "$GITHUB_WORKSPACE" || exit
 fi
 
+if [[ $(git describe --abbrev=0 --tags 2> /dev/null) -eq 0 ]]; then
+  FIRST_COMMIT=$(git rev-list --max-parents=0 HEAD)
+  git tag "CD_autocreate_tag" $FIRST_COMMIT
+  echo "No tags found. Created one on the initial commit"
+fi
+
 LATEST_TAG=$(git describe --abbrev=0 --tags)
 
 if [ -z "$DRY_RUN" ]; then
