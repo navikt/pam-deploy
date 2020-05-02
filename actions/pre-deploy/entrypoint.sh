@@ -13,9 +13,9 @@ fi
 while read -r id; do
   if [[ "$id" < "$GITHUB_RUN_ID" ]]; then
     echo "cancel in progress workflow runs to avoid conflicts"
-    curl -s -X POST -H "Authorization: token $GITHUB_TOKEN" "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/runs/$id/cancel"
+    curl -s -X POST -H "Authorization: token $GITHUB_TOKEN" "$GITHUB_URL/actions/runs/$id/cancel"
   fi
-done < <(curl -s -H "Authorization: token $GITHUB_TOKEN" "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/runs?event=push&status=in_progress&branch=master" | jq -r '.workflow_runs[].id')
+done < <(curl -s -H "Authorization: token $GITHUB_TOKEN" "$GITHUB_URL/actions/runs?event=push&status=in_progress&branch=master" | jq -r '.workflow_runs[].id')
 
 APPLICATION=$(echo $GITHUB_REPOSITORY | cut -d "/" -f 2)
 VERSION_TAG=$(TZ=Europe/Oslo date +"%y.%j.%H%M%S")
