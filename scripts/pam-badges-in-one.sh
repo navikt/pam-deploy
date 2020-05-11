@@ -34,4 +34,4 @@ do
    fi
 done
 
-echo "generated $FILE, NOTE: you have to manually move index.md to pam-deploy/docs/. Git push it to update pam-deploy dashboard""
+echo "generated $FILE, NOTE: you have to manually move index.md to pam-deploy/docs/. Git push it to update pam-deploy dashboard"
