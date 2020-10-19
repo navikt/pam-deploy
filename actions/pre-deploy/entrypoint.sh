@@ -23,6 +23,6 @@ if [ -z "$DOCKER_IMAGE" ]; then
   DOCKER_IMAGE=docker.pkg.github.com/$GITHUB_REPOSITORY/$APPLICATION
 fi
 IMAGE=$DOCKER_IMAGE:$VERSION_TAG
-echo "::set-env name=VERSION_TAG::$VERSION_TAG"
-echo "::set-env name=APPLICATION::$APPLICATION"
-echo "::set-env name=IMAGE::$IMAGE"
+echo "VERSION_TAG=$VERSION_TAG" >> "$GITHUB_ENV"
+echo "APPLICATION=$APPLICATION" >> "$GITHUB_ENV"
+echo "IMAGE=$IMAGE" >> "$GITHUB_ENV"
