@@ -28,4 +28,7 @@ GIT_LOG=$(git log $LATEST_RELEASE..$VERSION_TAG --no-merges --pretty=format:"* %
 CHANGELOG="$GIT_TREE%0A$COMPARE_LINK%0A$GIT_LOG"
 CHANGELOG="${CHANGELOG//$'\n'/'%0A'}"
 CHANGELOG="${CHANGELOG//$'\r'/'%0D'}"
-echo "::set-env name=CHANGE_LOG::$CHANGELOG"
+echo "CHANGE_LOG<<EOF" >> "$GITHUB_ENV"
+echo "$CHANGELOG" >> "$GITHUB_ENV"
+echo "EOF" >> "$GITHUB_ENV"
+
