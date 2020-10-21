@@ -26,8 +26,8 @@ GIT_TREE="[$VERSION_TAG](https://github.com/$GITHUB_REPOSITORY/tree/$VERSION_TAG
 COMPARE_LINK="[Full Changelog](https://github.com/$GITHUB_REPOSITORY/compare/$LATEST_RELEASE...$VERSION_TAG)"
 GIT_LOG=$(git log $LATEST_RELEASE..$VERSION_TAG --no-merges --pretty=format:"* %ad %s" -50 --date=short | sed "/^\\s*$/d")
 CHANGELOG="$GIT_TREE%0A$COMPARE_LINK%0A$GIT_LOG"
-CHANGELOG="${CHANGELOG//$'\n'/'%0A'}"
-CHANGELOG="${CHANGELOG//$'\r'/'%0D'}"
+# CHANGELOG="${CHANGELOG//$'\n'/'%0A'}"
+# CHANGELOG="${CHANGELOG//$'\r'/'%0D'}"
 echo "CHANGE_LOG<<EOF" >> "$GITHUB_ENV"
 echo "$CHANGELOG" >> "$GITHUB_ENV"
 echo "EOF" >> "$GITHUB_ENV"
