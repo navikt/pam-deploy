@@ -1,0 +1,5 @@
+name: 'Arbeidsplassen pre-production action'
+description: 'Preparation before production'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
