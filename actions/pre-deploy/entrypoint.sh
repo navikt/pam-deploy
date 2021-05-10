@@ -2,7 +2,7 @@
 set -e
 
 GITHUB_URL="https://api.github.com/repos/$GITHUB_REPOSITORY"
-DOCKER_HOST="ghcr.io"
+PAM_DOCKER_HOST="ghcr.io"
 
 DRAFTS=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "$GITHUB_URL/releases?per_page=20" | jq -r '. | map(select(.draft == true)) | length')
 if [[ "$DRAFTS" -gt "10" ]]; then
@@ -21,10 +21,10 @@ done < <(curl -s -H "Authorization: token $GITHUB_TOKEN" "$GITHUB_URL/actions/ru
 APPLICATION=$(echo $GITHUB_REPOSITORY | cut -d "/" -f 2)
 VERSION_TAG=$(TZ=Europe/Oslo date +"%y.%j.%H%M%S")
 if [ -z "$DOCKER_IMAGE" ]; then
-  DOCKER_IMAGE=$DOCKER_HOST/$GITHUB_REPOSITORY
+  DOCKER_IMAGE=$PAM_DOCKER_HOST/$GITHUB_REPOSITORY
 fi
 IMAGE=$DOCKER_IMAGE:$VERSION_TAG
 echo "VERSION_TAG=$VERSION_TAG" >> "$GITHUB_ENV"
 echo "APPLICATION=$APPLICATION" >> "$GITHUB_ENV"
 echo "IMAGE=$IMAGE" >> "$GITHUB_ENV"
-echo "DOCKER_HOST=$DOCKER_HOST" >> "$GITHUB_ENV"
+echo "PAM_DOCKER_HOST=$PAM_DOCKER_HOST" >> "$GITHUB_ENV"
