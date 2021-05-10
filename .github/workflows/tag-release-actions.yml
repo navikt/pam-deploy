@@ -39,7 +39,7 @@ jobs:
       - name: test pre-production
         uses: navikt/pam-deploy/actions/pre-production@v2
       - name: test post-production
-        uses: navikt/pam-deploy/actions/post-production@v1
+        uses: navikt/pam-deploy/actions/post-production@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DRY_RUN: true
