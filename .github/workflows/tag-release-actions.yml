@@ -28,24 +28,21 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: test pre-deploy
-        uses: navikt/pam-deploy/actions/pre-deploy@v2
+        uses: navikt/pam-deploy/actions/pre-deploy@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: test post-deploy
-        uses: navikt/pam-deploy/actions/post-deploy@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DRY_RUN: true
-      - name: test pre-production
-        uses: navikt/pam-deploy/actions/pre-production@v2
-      - name: test post-production
-        uses: navikt/pam-deploy/actions/post-production@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DRY_RUN: true
       - name: display variables
         run: |
           echo $VERSION_TAG
           echo $IMAGE
           echo $APPLICATION
-          echo $DOCKER_HOST
+      - name: test post-deploy
+        uses: navikt/pam-deploy/actions/post-deploy@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DRY_RUN: true
+      - name: test post-production
+        uses: navikt/pam-deploy/actions/post-production@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DRY_RUN: true
