@@ -2,7 +2,7 @@
 set -e
 
 GITHUB_URL="https://api.github.com/repos/$GITHUB_REPOSITORY"
-$DOCKER_REPO="gchr.io"
+DOCKER_REPO="ghcr.io"
 # Checking if too many drafts before starting the deploy
 DRAFTS=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "$GITHUB_URL/releases?per_page=20" | jq -r '. | map(select(.draft == true)) | length')
 if [[ "$DRAFTS" -gt "10" ]]; then
@@ -30,5 +30,5 @@ echo "IMAGE=$IMAGE" >> "$GITHUB_ENV"
 
 echo "building and push docker image"
 docker build . --pull -t $IMAGE
-echo $GITHUB_TOKEN | docker login --username $$GITHUB_REPOSITORY --password-stdin $DOCKER_REPO
+echo $GITHUB_TOKEN | docker login --username $GITHUB_REPOSITORY --password-stdin $DOCKER_REPO
 docker push $IMAGE
