@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -e
+DOCKER_REPO="ghcr.io"
+if [ -z "$DOCKER_IMAGE" ]; then
+  DOCKER_IMAGE=$DOCKER_REPO/$GITHUB_REPOSITORY
+fi
+IMAGE=$DOCKER_IMAGE:$VERSION_TAG
+echo "IMAGE=$IMAGE" >> "$GITHUB_ENV"
