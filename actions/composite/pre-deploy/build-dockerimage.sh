@@ -24,11 +24,12 @@ if [ -z "$DOCKER_IMAGE" ]; then
   DOCKER_IMAGE=$DOCKER_REPO/$GITHUB_REPOSITORY
 fi
 IMAGE=$DOCKER_IMAGE:$VERSION_TAG
-echo "VERSION_TAG=$VERSION_TAG" >> "$GITHUB_ENV"
-echo "APPLICATION=$APPLICATION" >> "$GITHUB_ENV"
-echo "IMAGE=$IMAGE" >> "$GITHUB_ENV"
 
 echo "building and push docker image"
 docker build . --pull -t $IMAGE
 echo $GITHUB_TOKEN | docker login --username $GITHUB_REPOSITORY --password-stdin $DOCKER_REPO
 docker push $IMAGE
+
+echo "VERSION_TAG=$VERSION_TAG" >> "$GITHUB_ENV"
+echo "APPLICATION=$APPLICATION" >> "$GITHUB_ENV"
+echo "IMAGE=$IMAGE" >> "$GITHUB_ENV"
