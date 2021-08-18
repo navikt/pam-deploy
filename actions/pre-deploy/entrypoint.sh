@@ -19,7 +19,11 @@ while read -r id; do
 done < <(curl -s -H "Authorization: token $GITHUB_TOKEN" "$GITHUB_URL/actions/runs?event=push&status=in_progress&branch=master" | jq -r '.workflow_runs[].id')
 
 APPLICATION=$(echo $GITHUB_REPOSITORY | cut -d "/" -f 2)
-VERSION_TAG=$(TZ=Europe/Oslo date +"%y.%j.%H%M%S")
+if [ -z "$VERSION_TAG" ]; then
+  VERSION_TAG=$VERSION_TAG
+else
+  VERSION_TAG=$(TZ=Europe/Oslo date +"%y.%j.%H%M%S")
+fi
 if [ -z "$DOCKER_IMAGE" ]; then
   DOCKER_IMAGE=$DOCKER_REPO/$GITHUB_REPOSITORY
 fi
