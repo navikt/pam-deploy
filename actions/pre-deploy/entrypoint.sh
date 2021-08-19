@@ -20,9 +20,9 @@ done < <(curl -s -H "Authorization: token $GITHUB_TOKEN" "$GITHUB_URL/actions/ru
 
 APPLICATION=$(echo $GITHUB_REPOSITORY | cut -d "/" -f 2)
 if [ -z "$VERSION_TAG" ]; then
-  VERSION_TAG=$VERSION_TAG
-else
   VERSION_TAG=$(TZ=Europe/Oslo date +"%y.%j.%H%M%S")
+else
+  VERSION_TAG=$VERSION_TAG
 fi
 if [ -z "$DOCKER_IMAGE" ]; then
   DOCKER_IMAGE=$DOCKER_REPO/$GITHUB_REPOSITORY
