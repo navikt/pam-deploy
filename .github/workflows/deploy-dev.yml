@@ -1,6 +1,8 @@
 on:
   workflow_call:
-
+    secrets:
+      NAIS_DEPLOY_APIKEY:
+        required: true
 jobs:
   deploy-dev:
     runs-on: ubuntu-latest
