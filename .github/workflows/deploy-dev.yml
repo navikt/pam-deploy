@@ -26,6 +26,7 @@ jobs:
           cache: 'gradle'
       - name: build and test
         run: |
+          ./gradlew --stop
           ./gradlew clean build -x test
       - name: pre-deploy
         uses: navikt/pam-deploy/actions/pre-deploy@v2
