@@ -1,7 +1,0 @@
-name: 'PAM Pre-Production Script'
-description: 'Get release version tag'
-runs:
-  using: "composite"
-  steps:
-    - run: ${{ github.action_path }}/get-release-versiontag.sh
-      shell: bash

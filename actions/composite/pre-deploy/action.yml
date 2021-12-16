@@ -1,7 +1,0 @@
-name: 'Pam Pre Deploy Scripts'
-description: 'Prepare, build and push docker image'
-runs:
-  using: "composite"
-  steps:
-    - run: ${{ github.action_path }}/build-dockerimage.sh
-      shell: bash

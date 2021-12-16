@@ -1,7 +1,0 @@
-name: 'PAM post deploy script'
-description: 'Create a changelog'
-runs:
-  using: "composite"
-  steps:
-    - run: ${{ github.action_path }}/create-changelog.sh
-      shell: bash
