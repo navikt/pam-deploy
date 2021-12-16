@@ -2,9 +2,9 @@ on:
   workflow_call:
 
 jobs:
-  build-and-deploy:
+  deploy-dev:
     runs-on: ubuntu-latest
-    environment: dev-gcp
+    environment: production
     steps:
       - uses: actions/checkout@v2
         with:
@@ -17,28 +17,28 @@ jobs:
       - name: build and test
         run: |
           ./gradlew clean build -x test
-    - name: pre-deploy
-      uses: navikt/pam-deploy/actions/pre-deploy@v2
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - name: deploy to dev-gcp
-      uses: nais/deploy/actions/deploy@v1
-      env:
-        APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-        CLUSTER: dev-gcp
-        RESOURCE: naiserator.yml
-        VARS: naiserator-dev.json
-    - name: post-deploy
-      uses: navikt/pam-deploy/actions/post-deploy@v2
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - name: draft release
-      uses: actions/create-release@latest
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ env.VERSION_TAG }}
-        release_name: ${{ env.APPLICATION }} ${{ env.VERSION_TAG }}
-        body: ${{ env.CHANGE_LOG }}
-        draft: true
-        prerelease: false
+      - name: pre-deploy
+        uses: navikt/pam-deploy/actions/pre-deploy@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: deploy to dev-gcp
+        uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: dev-gcp
+          RESOURCE: naiserator.yml
+          VARS: naiserator-dev.json
+      - name: post-deploy
+        uses: navikt/pam-deploy/actions/post-deploy@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: draft release
+        uses: actions/create-release@latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ env.VERSION_TAG }}
+          release_name: ${{ env.APPLICATION }} ${{ env.VERSION_TAG }}
+          body: ${{ env.CHANGE_LOG }}
+          draft: true
+          prerelease: false
