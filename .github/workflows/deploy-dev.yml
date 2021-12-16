@@ -4,7 +4,7 @@ on:
 jobs:
   deploy-dev:
     runs-on: ubuntu-latest
-    environment: production
+    environment: dev-gcp
     steps:
       - uses: actions/checkout@v2
         with:
