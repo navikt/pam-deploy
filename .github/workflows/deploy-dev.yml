@@ -18,7 +18,7 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          command: test --severity-threshold=high
+          command: test --org=teampam --severity-threshold=high
       - uses: actions/setup-java@v2
         with:
           distribution: 'zulu'
