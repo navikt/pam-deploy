@@ -1,5 +1,13 @@
 on:
   workflow_call:
+    inputs:
+      NAIS_RESOURCE:
+        required: false
+        type: string
+        default: "naiserator.yml"
+    secrets:
+      NAIS_DEPLOY_APIKEY:
+        required: true
 
 jobs:
   deploy-prod:
@@ -20,7 +28,7 @@ jobs:
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: prod-gcp
-          RESOURCE: naiserator.yml,topic.yaml
+          RESOURCE: ${{ inputs.NAIS_RESOURCE }}
           VARS: naiserator-prod.json
       - name: post-production
         uses: navikt/pam-deploy/actions/post-production@v2
