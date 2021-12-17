@@ -1,5 +1,10 @@
 on:
   workflow_call:
+    inputs:
+      SNYK_ENABLED:
+        required: false
+        type: boolean
+        default: true
     secrets:
       NAIS_DEPLOY_APIKEY:
         required: true
@@ -13,12 +18,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - name: snyk test
-        uses: snyk/actions/gradle@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          command: test --org=teampam --severity-threshold=high
+      - uses: snyk/actions/setup@master
       - uses: actions/setup-java@v2
         with:
           distribution: 'zulu'
@@ -26,30 +26,34 @@ jobs:
           cache: 'gradle'
       - name: build and test
         run: |
-          ./gradlew --stop
-          ./gradlew clean build -x test
-      - name: pre-deploy
-        uses: navikt/pam-deploy/actions/pre-deploy@v2
+          ./gradlew clean build
+      - name: SNYK test
+        if: ${{ inputs.SNYK_ENABLED }}
+        run: snyk test --org=teampam --severity-threshold=high
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: deploy to dev-gcp
-        uses: nais/deploy/actions/deploy@v1
-        env:
-          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-          CLUSTER: dev-gcp
-          RESOURCE: naiserator.yml
-          VARS: naiserator-dev.json
-      - name: post-deploy
-        uses: navikt/pam-deploy/actions/post-deploy@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: draft release
-        uses: actions/create-release@latest
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ env.VERSION_TAG }}
-          release_name: ${{ env.APPLICATION }} ${{ env.VERSION_TAG }}
-          body: ${{ env.CHANGE_LOG }}
-          draft: true
-          prerelease: false
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+#      - name: pre-deploy
+#        uses: navikt/pam-deploy/actions/pre-deploy@v2
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#      - name: deploy to dev-gcp
+#        uses: nais/deploy/actions/deploy@v1
+#        env:
+#          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+#          CLUSTER: dev-gcp
+#          RESOURCE: naiserator.yml
+#          VARS: naiserator-dev.json
+#      - name: post-deploy
+#        uses: navikt/pam-deploy/actions/post-deploy@v2
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#      - name: draft release
+#        uses: actions/create-release@latest
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        with:
+#          tag_name: ${{ env.VERSION_TAG }}
+#          release_name: ${{ env.APPLICATION }} ${{ env.VERSION_TAG }}
+#          body: ${{ env.CHANGE_LOG }}
+#          draft: true
+#          prerelease: false
