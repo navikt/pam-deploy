@@ -15,14 +15,14 @@ jobs:
           IMAGE=ghcr.io/$GITHUB_REPOSITORY:$VERSION_TAG
           echo "IMAGE=$IMAGE" >> $GITHUB_ENV
           echo $IMAGE
-#      - uses: nais/deploy/actions/deploy@v1
-#        name: deploy to prod-gcp
-#        env:
-#          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-#          CLUSTER: prod-gcp
-#          RESOURCE: naiserator.yml,topic.yaml
-#          VARS: naiserator-prod.json
-#      - name: post-production
-#        uses: navikt/pam-deploy/actions/post-production@v2
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: nais/deploy/actions/deploy@v1
+        name: deploy to prod-gcp
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: prod-gcp
+          RESOURCE: naiserator.yml,topic.yaml
+          VARS: naiserator-prod.json
+      - name: post-production
+        uses: navikt/pam-deploy/actions/post-production@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
