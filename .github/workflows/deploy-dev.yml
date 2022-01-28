@@ -25,6 +25,10 @@ on:
         required: false
         type: string
         default: "naiserator.yml"
+      NAIS_VARS:
+        required: false
+        type: string
+        default: "naiserator-dev.json"
     secrets:
       NAIS_DEPLOY_APIKEY:
         required: true
@@ -70,7 +74,7 @@ jobs:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-gcp
           RESOURCE: ${{ inputs.NAIS_RESOURCE }}
-          VARS: naiserator-dev.json
+          VARS: ${{ inputs.NAIS_VARS }}
       - name: Post-deploy
         uses: navikt/pam-deploy/actions/post-deploy@v2
         env:

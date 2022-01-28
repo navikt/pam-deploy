@@ -5,6 +5,10 @@ on:
         required: false
         type: string
         default: "naiserator.yml"
+      NAIS_VARS:
+        required: false
+        type: string
+        default: "naiserator-prod.json"
     secrets:
       NAIS_DEPLOY_APIKEY:
         required: true
@@ -29,7 +33,7 @@ jobs:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: prod-gcp
           RESOURCE: ${{ inputs.NAIS_RESOURCE }}
-          VARS: naiserator-prod.json
+          VARS: ${{ inputs.NAIS_VARS }}
       - name: post-production
         uses: navikt/pam-deploy/actions/post-production@v2
         env:
