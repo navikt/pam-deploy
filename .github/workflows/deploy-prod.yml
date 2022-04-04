@@ -18,7 +18,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          ref: $VERSION_TAG
+          ref: ${{ VERSION_TAG }}
       - name: get release tag
         run: |
           APPLICATION=$(echo $GITHUB_REPOSITORY | cut -d "/" -f 2)
