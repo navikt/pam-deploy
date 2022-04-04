@@ -8,6 +8,8 @@ on:
     secrets:
       NAIS_DEPLOY_APIKEY:
         required: true
+env:
+  VERSION_TAG: ${{ github.event.release.tag_name }}
 
 jobs:
   deploy-prod:
@@ -15,9 +17,9 @@ jobs:
     environment: prod-gcp
     steps:
       - uses: actions/checkout@v2
+        with:
+          ref: $VERSION_TAG
       - name: get release tag
-        env:
-          VERSION_TAG: ${{ github.event.release.tag_name }}
         run: |
           APPLICATION=$(echo $GITHUB_REPOSITORY | cut -d "/" -f 2)
           IMAGE=ghcr.io/$GITHUB_REPOSITORY:$VERSION_TAG
