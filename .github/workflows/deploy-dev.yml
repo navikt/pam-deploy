@@ -25,6 +25,10 @@ on:
         required: false
         type: string
         default: "naiserator.yml"
+      CLUSTER:
+        required: false
+        type: string
+        default: "dev-gcp"
     secrets:
       NAIS_DEPLOY_APIKEY:
         required: true
@@ -33,7 +37,7 @@ on:
 jobs:
   deploy-dev:
     runs-on: ubuntu-latest
-    environment: dev-gcp
+    environment: ${{ inputs.CLUSTER }}
     steps:
       - uses: actions/checkout@v2
         with:
@@ -64,11 +68,11 @@ jobs:
         uses: navikt/pam-deploy/actions/pre-deploy@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Deploy to dev-gcp
+      - name: Deploy to ${{ inputs.CLUSTER }}
         uses: nais/deploy/actions/deploy@v1
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-          CLUSTER: dev-gcp
+          CLUSTER: ${{ inputs.CLUSTER }}
           RESOURCE: ${{ inputs.NAIS_RESOURCE }}
           VARS: naiserator-dev.json
       - name: Post-deploy

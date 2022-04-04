@@ -5,6 +5,10 @@ on:
         required: false
         type: string
         default: "naiserator.yml"
+      CLUSTER:
+        required: false
+        type: string
+        default: "prod-gcp"
     secrets:
       NAIS_DEPLOY_APIKEY:
         required: true
@@ -14,7 +18,7 @@ env:
 jobs:
   deploy-prod:
     runs-on: ubuntu-latest
-    environment: prod-gcp
+    environment: ${{ inputs.CLUSTER }}
     steps:
       - uses: actions/checkout@v2
         with:
@@ -27,10 +31,10 @@ jobs:
           echo "IMAGE=$IMAGE" >> $GITHUB_ENV
           echo $IMAGE
       - uses: nais/deploy/actions/deploy@v1
-        name: deploy to prod-gcp
+        name: deploy to ${{ inputs.CLUSTER }}
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-          CLUSTER: prod-gcp
+          CLUSTER: ${{ inputs.CLUSTER }}
           RESOURCE: ${{ inputs.NAIS_RESOURCE }}
           VARS: naiserator-prod.json
       - name: post-production
