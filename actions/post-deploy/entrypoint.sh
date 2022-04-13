@@ -3,7 +3,7 @@ set -e
 
 if [ -n "$GITHUB_WORKSPACE" ]; then
   echo $GITHUB_WORKSPACE
-  cd "$GITHUB_WORKSPACE" || exit
+  cd "$GITHUB_WORKSPACE"
 fi
 # security reasons
 git config --global --add safe.directory /github/workspace
