@@ -1,0 +1,30 @@
+on:
+  workflow_call:
+    inputs:
+      NAIS_RESOURCE:
+        required: false
+        type: string
+        default: "naiserator.yml"
+      CLUSTER:
+        required: false
+        type: string
+        default: "dev-gcp"
+    secrets:
+      NAIS_DEPLOY_APIKEY:
+        required: true
+jobs:
+  deploy-dev:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.CLUSTER }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: snyk/actions/setup@master
+
+      - name: update-documentation
+        uses: navikt/pam-deploy/actions/documentation@v2
+        env:
+          CLUSTER: ${{ inputs.CLUSTER }}
+          RESOURCE: ${{ inputs.NAIS_RESOURCE }}
+          # VARS: naiserator-prod.json
