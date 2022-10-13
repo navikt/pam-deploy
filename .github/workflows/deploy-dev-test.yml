@@ -23,6 +23,7 @@ jobs:
       - name: get documentation contentfile
         run: |
           echo CONTENT=$(gh api -H "Accept: application/vnd.github.v3.raw" /repos/navikt/pam-doc/contents/README.md) >> $GITHUB_ENV
+          printenv
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: update-documentation
