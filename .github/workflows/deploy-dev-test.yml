@@ -11,6 +11,7 @@ on:
         default: "dev-gcp"
       image: 
         required: false
+        type: string
     secrets:
       NAIS_DEPLOY_APIKEY:
         required: true
