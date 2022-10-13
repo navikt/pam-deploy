@@ -9,6 +9,8 @@ on:
         required: false
         type: string
         default: "dev-gcp"
+      image: 
+        required: false
     secrets:
       NAIS_DEPLOY_APIKEY:
         required: true
@@ -32,6 +34,7 @@ jobs:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: ${{ inputs.CLUSTER }}
           RESOURCE: ${{ inputs.NAIS_RESOURCE }}
+          VAR: image=${{ env.image }}
       - run: |
           printenv
       - name: update-documentation
