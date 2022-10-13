@@ -20,11 +20,14 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
+      - name: get documentation contentfile
+      - run: |
+          echo CONTENT=$(gh api -H "Accept: application/vnd.github.v3.raw" /repos/navikt/pam-doc/contents/README.md) >> $GITHUB_ENV
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: update-documentation
         uses: navikt/pam-deploy/actions/documentation@v2
         env:
           CLUSTER: ${{ inputs.CLUSTER }}
           RESOURCE: ${{ inputs.NAIS_RESOURCE }}
-          # username: ${{ github.actor }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # VARS: naiserator-prod.json
+          CONTENT: ${{ env.CONTENT }}
