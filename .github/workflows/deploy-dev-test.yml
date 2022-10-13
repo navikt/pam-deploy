@@ -34,7 +34,7 @@ jobs:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: ${{ inputs.CLUSTER }}
           RESOURCE: ${{ inputs.NAIS_RESOURCE }}
-          VAR: image=${{ env.image }}
+          VAR: image=${{ inputs.image }}
       - run: |
           printenv
       - name: update-documentation
