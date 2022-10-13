@@ -75,6 +75,8 @@ jobs:
           CLUSTER: ${{ inputs.CLUSTER }}
           RESOURCE: ${{ inputs.NAIS_RESOURCE }}
           VARS: naiserator-dev.json
+      - run: |
+          printenv
       - name: Post-deploy
         uses: navikt/pam-deploy/actions/post-deploy@v2
         env:
