@@ -1,0 +1,87 @@
+apiVersion: "nais.io/v1alpha1"
+kind: "Application"
+metadata:
+  name: pam-cv-api
+  namespace: {{{ namespace }}}
+  labels:
+    team: teampam
+spec:
+  image: {{{ image }}}
+  port: 8080
+  liveness:
+    path: pam-cv-api/rest/internal/isAlive
+    initialDelay: 70
+    timeout: 1
+    failureThreshold: 2
+  readiness:
+    path: pam-cv-api/rest/internal/isReady
+    initialDelay: 70
+    timeout: 1
+  replicas:
+    min: {{ min-replicas }}
+    max: 6
+  cpuThresholdPercentage: 50
+  resources:
+    limits:
+      cpu: 3000m
+      memory: 2048Mi
+    requests:
+      cpu: 200m
+      memory: 512Mi
+  vault:
+    enabled: true
+  secureLogs:
+    enabled: true
+  prometheus:
+    enabled: true
+    path: pam-cv-api/actuator/prometheus
+  ingresses:
+  {{#each ingress as |url|}}
+     - {{url}}
+  {{/each}}
+  envFrom:
+    - configmap: loginservice-idporten
+  azure:
+    application:
+      enabled: true
+      tenant: {{ azure_ad_tenant }}
+  kafka:
+    pool: {{ kafka_pool }}
+  accessPolicy:
+    inbound:
+      rules:
+        - application: pam-cv-veileder
+        - application: pam-personbruker-veileder
+          cluster: {{ gcp_cluster }}
+        - application: salesforce
+          namespace: teamcrm
+          cluster: {{ external_cluster }}
+        - application: veilarbperson
+          namespace: pto
+  env:
+    - name: SAMTYKKE_SCOPE
+      value: {{ samtykke_scope }}
+    - name: PERSONOPPSLAG_SCOPE
+      value: {{ personoppslag_scope }}
+    - name: PDL_SCOPE
+      value: {{ pdl_scope }}
+    - name: PERSONOPPSLAG_BASE_URL
+      value: {{ personoppslag_base_url }}
+    - name: DKIF_BASE_URL
+      value: {{ dkif_base_url }}
+    - name: KAFKA_BOOTSTRAP_SERVERS
+      value: {{ kafka_brokers }}
+    - name: KAFKA_SECURITY_PROTOCOL
+      value: {{ kafka_security_protocol }}
+    - name: KAFKA_SCHEMA_REGISTRY_ONPREM
+      value: {{ kafka_schema_registry }}
+    - name: AAREG_BASE_URL
+      value: {{ aareg_base_url }}
+    - name: EREG_BASE_URL
+      value: {{ ereg_base_url }}
+    - name: SSB_BASE_URL
+      value: {{ ssb_base_url }}
+    - name: JANZZ_BASE_URL
+      value: {{ janzz_base_url }}
+    - name: PDL_BASE_URL
+      value: {{ pdl_base_url }}

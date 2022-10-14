@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 set -e
 
-echo $CONTENT
-echo $CLUSTER
+/go/naisparser
+CONTENT=$(<tmp.json)
+
+echo "NAIS_CONTNENT=$CONTENT" >> "$GITHUB_ENV"
+echo $GITHUB_ENV
