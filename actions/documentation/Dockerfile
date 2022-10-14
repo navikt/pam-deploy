@@ -20,7 +20,7 @@ COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 COPY tmp.json /tmp.json
-RUN chmod +x /tmp.json
+RUN chmod +rw /tmp.json
 
 COPY naiserator.yml ./
 COPY naiserator-dev.json ./
