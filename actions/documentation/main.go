@@ -16,6 +16,26 @@ type TemplateVariables map[string]interface{}
 
 
 
+func main() {
+	var err error
+	var templateVariables = make(TemplateVariables)
+	
+	templateVariables, err = templateVariablesFromFile("./naiserator-dev.json")
+	if err != nil {fmt.Println(err)}
+
+	parsed, err := MultiDocumentFileAsJSON("naiserator.yml", templateVariables)
+	if err != nil {fmt.Println(err)}
+
+	var js, err2 = json.Marshal(parsed)
+	if err2 != nil {fmt.Println(err)}
+
+	fmt.Println("From GO: writing %v",string(js))
+	_ = ioutil.WriteFile("tmp.json", js, 0644)
+	file, _ := ioutil.ReadFile("tmp.json")
+	fmt.Println("From GO: reading %v",string(file))
+}
+
+
 func templateVariablesFromFile(path string) (TemplateVariables, error) {
 	var err error
 	file, err := ioutil.ReadFile(path)
@@ -28,18 +48,6 @@ func templateVariablesFromFile(path string) (TemplateVariables, error) {
 
 	return vars, err
 }
-
-func main() {
-	var templateVariables = make(TemplateVariables)
-	templateVariables, _ = templateVariablesFromFile("./naiserator-dev.json")
-	parsed, _ := MultiDocumentFileAsJSON("naiserator.yml", templateVariables)
-	var js, _ = json.Marshal(parsed)
-	fmt.Println("From GO: writing %v",string(js))
-	_ = ioutil.WriteFile("tmp.json", js, 0644)
-	file, _ := ioutil.ReadFile("tmp.json")
-	fmt.Println("From GO: reading %v",string(file))
-}
-
 
 
 
