@@ -34,7 +34,10 @@ func main() {
 	templateVariables, _ = templateVariablesFromFile("./naiserator-dev.json")
 	parsed, _ := MultiDocumentFileAsJSON("naiserator.yml", templateVariables)
 	var js, _ = json.Marshal(parsed)
+	fmt.Println("From GO: writing %v",string(js))
 	_ = ioutil.WriteFile("tmp.json", js, 0644)
+	file, _ := ioutil.ReadFile("tmp.json")
+	fmt.Println("From GO: reading %v",string(file))
 }
 
 
