@@ -73,8 +73,7 @@ func main() {
 	if err2 != nil {fmt.Println(err)}
 
 	fmt.Println("Writing to tmp file: %v",string(js))
-	_ = ioutil.WriteFile("tmp.json", js, 0644)
-	_, _ := ioutil.ReadFile("tmp.json")
+	ioutil.WriteFile("tmp.json", js, 0644)
 	fmt.Println("Done.")
 }
 
