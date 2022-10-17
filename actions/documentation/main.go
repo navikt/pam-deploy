@@ -17,14 +17,14 @@ import (
 type TemplateVariables map[string]interface{}
 
 type Config struct {
-	Resource           []string
+	Resource           string
 	Variables          []string
 	VariablesFile      string
 }
 
 func InitConfig(cfg *Config) {
 	flag.ErrHelp = fmt.Errorf("\ndeploy prepares Kubernetes resources.\n")
-	flag.StringSliceVar(&cfg.Resource, "resource", getEnvStringSlice("RESOURCE"), "File with Kubernetes resource. Can be specified multiple times. (env RESOURCE)")
+	flag.StringVar(&cfg.Resource, "resource", os.Getenv("RESOURCE"), "File with Kubernetes resource. Can be specified multiple times. (env RESOURCE)")
 	flag.StringSliceVar(&cfg.Variables, "var", getEnvStringSlice("VAR"), "Template variable in the form KEY=VALUE. Can be specified multiple times. (env VAR)")
 	flag.StringVar(&cfg.VariablesFile, "vars", os.Getenv("VARS"), "File containing template variables. (env VARS)")
 	flag.Parse()
@@ -60,7 +60,7 @@ func main() {
 		}
 	}
 		
-	parsed, err := MultiDocumentFileAsJSON("nais.yml", templateVariables)
+	parsed, err := MultiDocumentFileAsJSON(cfg.Resource, templateVariables)
 	if err != nil {fmt.Println(err)}
 
 	var js, err2 = json.Marshal(parsed)
