@@ -74,7 +74,7 @@ func main() {
 
 	fmt.Println("Writing to tmp file: %v",string(js))
 	_ = ioutil.WriteFile("tmp.json", js, 0644)
-	file, _ := ioutil.ReadFile("tmp.json")
+	_, _ := ioutil.ReadFile("tmp.json")
 	fmt.Println("Done.")
 }
 
