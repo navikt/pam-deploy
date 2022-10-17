@@ -59,7 +59,7 @@ func main() {
 			if oldval, ok := templateVariables[key]; ok {
 				fmt.Println("Overwriting template variable '%s'; previous value was '%v'", key, oldval)
 			}
-			fmt.Println("Setting template variable '%s' to '%v'", key, val)
+			fmt.Println("Setting template variable %s to %v", key, val)
 			templateVariables[key] = val
 		}
 	}
@@ -72,7 +72,6 @@ func main() {
 	var js, err2 = json.Marshal(parsed)
 	if err2 != nil {fmt.Println(err)}
 
-	fmt.Println("Writing to tmp file: %v",string(js))
 	ioutil.WriteFile("tmp.json", js, 0644)
 	fmt.Println("Done.")
 }
