@@ -5,25 +5,62 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"os"
 	"io/ioutil"
 	"strings"
 	"github.com/aymerick/raymond"
 	"github.com/ghodss/yaml"
 	yamlv2 "gopkg.in/yaml.v2"
+	flag "github.com/spf13/pflag"
 )
 
 type TemplateVariables map[string]interface{}
 
+type Config struct {
+	Resource           []string
+	Variables          []string
+	VariablesFile      string
+}
 
+func InitConfig(cfg *Config) {
+	flag.ErrHelp = fmt.Errorf("\ndeploy prepares Kubernetes resources.\n")
+	flag.StringSliceVar(&cfg.Resource, "resource", getEnvStringSlice("RESOURCE"), "File with Kubernetes resource. Can be specified multiple times. (env RESOURCE)")
+	flag.StringSliceVar(&cfg.Variables, "var", getEnvStringSlice("VAR"), "Template variable in the form KEY=VALUE. Can be specified multiple times. (env VAR)")
+	flag.StringVar(&cfg.VariablesFile, "vars", os.Getenv("VARS"), "File containing template variables. (env VARS)")
+	flag.Parse()
+}
 
 func main() {
 	var err error
 	var templateVariables = make(TemplateVariables)
-	
-	templateVariables, err = templateVariablesFromFile("./naiserator-dev.json")
-	if err != nil {fmt.Println(err)}
 
-	parsed, err := MultiDocumentFileAsJSON("naiserator.yml", templateVariables)
+	var cfg = new(Config)
+	InitConfig(cfg)
+
+	if len(cfg.Resource) == 0 {
+		fmt.Println("No nais resource provided. Exiting documentation")
+		return
+	}
+	
+	if len(cfg.VariablesFile) > 0 {
+		templateVariables, err = templateVariablesFromFile(cfg.VariablesFile)
+		if err != nil {
+			fmt.Println("load template variables: %s", err)
+		}
+	}
+
+	if len(cfg.Variables) > 0 {
+		templateOverrides := templateVariablesFromSlice(cfg.Variables)
+		for key, val := range templateOverrides {
+			if oldval, ok := templateVariables[key]; ok {
+				fmt.Println("Overwriting template variable '%s'; previous value was '%v'", key, oldval)
+			}
+			fmt.Println("Setting template variable '%s' to '%v'", key, val)
+			templateVariables[key] = val
+		}
+	}
+		
+	parsed, err := MultiDocumentFileAsJSON("nais.yml", templateVariables)
 	if err != nil {fmt.Println(err)}
 
 	var js, err2 = json.Marshal(parsed)
@@ -47,6 +84,23 @@ func templateVariablesFromFile(path string) (TemplateVariables, error) {
 	err = yaml.Unmarshal(file, &vars)
 
 	return vars, err
+}
+
+func templateVariablesFromSlice(vars []string) TemplateVariables {
+	tv := TemplateVariables{}
+	for _, keyval := range vars {
+		tokens := strings.SplitN(keyval, "=", 2)
+		switch len(tokens) {
+		case 2: // KEY=VAL
+			tv[tokens[0]] = tokens[1]
+		case 1: // KEY
+			tv[tokens[0]] = true
+		default:
+			continue
+		}
+	}
+
+	return tv
 }
 
 
@@ -112,3 +166,11 @@ func templatedFile(data []byte, ctx TemplateVariables) ([]byte, error) {
 	return []byte(output), nil
 }
 
+
+func getEnvStringSlice(key string) []string {
+	if value, ok := os.LookupEnv(key); ok {
+		return strings.Split(value, ",")
+	}
+
+	return []string{}
+}

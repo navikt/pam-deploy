@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 set -e
-echo "Hello before parser"
-ls
+
+# run go naisparser module
 /go/naisparser
+
+#Get content from tmpl file
 CONTENT=$(<tmp.json)
 echo $CONTENT
-echo "hello after parser"
 
+#Set content as github environment
 echo "NAIS_CONTNENT=$CONTENT" >> "$GITHUB_ENV"
 echo $GITHUB_ENV
-echo "hello echo env var"
