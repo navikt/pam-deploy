@@ -9,7 +9,10 @@ on:
         required: false
         type: string
         default: "dev-gcp"
-      image: 
+      VAR:
+        required: false
+        type: string
+      VARS:
         required: false
         type: string
     secrets:
@@ -33,3 +36,5 @@ jobs:
         env:
           CLUSTER: ${{ inputs.CLUSTER }}
           RESOURCE: ${{ inputs.NAIS_RESOURCE }}
+          VAR: ${{ inputs.VAR }}
+          VARS: ${{ inputs.VARS }}

@@ -66,7 +66,7 @@ func main() {
 		
 	fmt.Println("Merging template var with resource")
 	parsed, err := MultiDocumentFileAsJSON(cfg.Resource, templateVariables)
-	if err != nil {fmt.Println(err)}
+	if err != nil {fmt.Println(err)}MultiDocumentFileAsJSON
 
 	fmt.Println("Converting yml to json")
 	var js, err2 = json.Marshal(parsed)
@@ -143,7 +143,7 @@ func MultiDocumentFileAsJSON(path string, ctx TemplateVariables) ([]json.RawMess
 		data, err := yaml.YAMLToJSON(rawdocument)
 		if err != nil {
 			errMsg := strings.ReplaceAll(err.Error(), "\n", ": ")
-			return nil, fmt.Errorf("%s: %s", path, errMsg)
+			return nil, fmt.Errorf("yamlToJSon %s: %s", path, errMsg)
 		}
 
 		messages = append(messages, data)
