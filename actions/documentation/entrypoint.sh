@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -e
 echo "Hello before parser"
+ls
 /go/naisparser
 CONTENT=$(<tmp.json)
 echo $CONTENT
