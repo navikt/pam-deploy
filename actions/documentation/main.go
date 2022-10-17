@@ -66,7 +66,7 @@ func main() {
 		
 	fmt.Println("Merging template var with resource")
 	parsed, err := MultiDocumentFileAsJSON(cfg.Resource, templateVariables)
-	if err != nil {fmt.Println(err)}MultiDocumentFileAsJSON
+	if err != nil {fmt.Println(err)}
 
 	fmt.Println("Converting yml to json")
 	var js, err2 = json.Marshal(parsed)
