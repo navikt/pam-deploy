@@ -32,8 +32,10 @@ func InitConfig(cfg *Config) {
 
 func main() {
 	var err error
-	var templateVariables = make(TemplateVariables)
+	
+	fmt.Println("Initializing documentation process")
 
+	var templateVariables = make(TemplateVariables)
 	var cfg = new(Config)
 	InitConfig(cfg)
 
@@ -41,8 +43,9 @@ func main() {
 		fmt.Println("No nais resource provided. Exiting documentation")
 		return
 	}
-	
+
 	if len(cfg.VariablesFile) > 0 {
+		fmt.Println("Loading template variables from file")
 		templateVariables, err = templateVariablesFromFile(cfg.VariablesFile)
 		if err != nil {
 			fmt.Println("load template variables: %s", err)
@@ -50,6 +53,7 @@ func main() {
 	}
 
 	if len(cfg.Variables) > 0 {
+		fmt.Println("Loading template variables from string")
 		templateOverrides := templateVariablesFromSlice(cfg.Variables)
 		for key, val := range templateOverrides {
 			if oldval, ok := templateVariables[key]; ok {
@@ -60,16 +64,18 @@ func main() {
 		}
 	}
 		
+	fmt.Println("Merging template var with resource")
 	parsed, err := MultiDocumentFileAsJSON(cfg.Resource, templateVariables)
 	if err != nil {fmt.Println(err)}
 
+	fmt.Println("Converting yml to json")
 	var js, err2 = json.Marshal(parsed)
 	if err2 != nil {fmt.Println(err)}
 
-	fmt.Println("From GO: writing %v",string(js))
+	fmt.Println("Writing to tmp file: %v",string(js))
 	_ = ioutil.WriteFile("tmp.json", js, 0644)
 	file, _ := ioutil.ReadFile("tmp.json")
-	fmt.Println("From GO: reading %v",string(file))
+	fmt.Println("Done.")
 }
 
 
