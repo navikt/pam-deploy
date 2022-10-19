@@ -36,8 +36,8 @@ jobs:
 
       - name: get documentation contentfile
         run: |
-          echo CONTENT=$(gh api -H "Accept: application/vnd.github.v3.raw" /repos/navikt/pam-repoinfo/contents/repos.json --jq '.[]') >> $GITHUB_ENV
-          CONTENT=$(gh api -H "Accept: application/vnd.github.v3.raw" /repos/navikt/pam-repoinfo/contents/repos.json --jq '.[]')
+          echo CONTENT=$(gh api -H "Accept: application/vnd.github.v3.raw" /repos/navikt/pam-repoinfo/contents/repos.json) >> $GITHUB_ENV
+          CONTENT=$(gh api -H "Accept: application/vnd.github.v3.raw" /repos/navikt/pam-repoinfo/contents/repos.json | jq .[])
           echo $CONTENT
       # - name: Set 
       #   run: |
