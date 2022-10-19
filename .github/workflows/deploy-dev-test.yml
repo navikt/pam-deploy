@@ -39,8 +39,6 @@ jobs:
           echo CONTENT=$(gh api -H "Accept: application/vnd.github.v3.raw" /repos/navikt/pam-repoinfo/contents/repos.json --jq '.[]') >> $GITHUB_ENV
           CONTENT=$(gh api -H "Accept: application/vnd.github.v3.raw" /repos/navikt/pam-repoinfo/contents/repos.json --jq '.[]')
           echo $CONTENT
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       # - name: Set 
       #   run: |
       #     REPOS=$(gh api -H "Accept: application/vnd.github.v3.raw" /repos/navikt/pam-repoinfo/contents/repos.json --jq '.[]') 
