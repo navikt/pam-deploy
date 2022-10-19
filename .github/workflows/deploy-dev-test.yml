@@ -34,11 +34,18 @@ jobs:
           VAR: ${{ inputs.VAR }}
           VARS: ${{ inputs.VARS }}
 
-      - name: Set 
+      - name: get documentation contentfile
         run: |
-          REPOS=$(gh api -H "Accept: application/vnd.github.v3.raw" /repos/navikt/pam-repoinfo/contents/repos.json --jq '.[]') 
-          echo $REPOS
-          REPOS+=({{env.NAIS_CONTENT}} | jq '.[]')
-          echo $REPOS
+          echo CONTENT=$(gh api -H "Accept: application/vnd.github.v3.raw" /repos/navikt/pam-doc/contents/README.md) >> $GITHUB_ENV
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # - name: Set 
+      #   run: |
+      #     REPOS=$(gh api -H "Accept: application/vnd.github.v3.raw" /repos/navikt/pam-repoinfo/contents/repos.json --jq '.[]') 
+      #     echo $REPOS
+      #     REPOS+=({{env.NAIS_CONTENT}} | jq '.[]')
+      #     echo $REPOS
+      #     gh api --method POST
+          
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
