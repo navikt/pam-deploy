@@ -29,7 +29,8 @@ jobs:
       - name: get documentation contentfile
         run: |
           gh api -H "Accept: application/vnd.github.v3.raw" /repos/navikt/pam-doc/contents/README.md
-          gh api -H "Accept: application/vnd.github+json" /repos/navikt/pam-repoinfo/contents/repos.json
+          gh api -H "Accept: application/vnd.github.v3.raw" /repos/navikt/pam-repoinfo/contents/repos.json
+          gh api -H "Accept: application/vnd.github.v3.raw" /repos/navikt/pam-repoinfo/contents/README.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Update Documentation
