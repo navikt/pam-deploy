@@ -8,4 +8,4 @@ set -e
 CONTENT=$(<tmp.json)
 
 #Set content as github environment
-echo "NAIS_CONTNENT=$CONTENT" >> "$GITHUB_ENV"
+echo "NAIS_CONTENT=$CONTENT" >> "$GITHUB_ENV"

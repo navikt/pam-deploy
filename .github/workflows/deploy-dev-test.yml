@@ -35,9 +35,9 @@ jobs:
           VARS: ${{ inputs.VARS }}
       - name: Set 
         run: |
-          REPOS=$(gh api -H "Accept: application/vnd.github.v3.raw" /repos/navikt/pam-repoinfo/contents/repos.json) | jq .[]
+          REPOS=$(gh api -H "Accept: application/vnd.github.v3.raw" /repos/navikt/pam-repoinfo/contents/repos.json --jq .[]) 
           echo $REPOS
-          REPOS+=({{env.NAIS_CONTNENT}} | jq .[])
+          REPOS+=({{env.NAIS_CONTENT}} | jq .[])
           echo $REPOS
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
