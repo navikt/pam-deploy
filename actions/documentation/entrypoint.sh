@@ -10,5 +10,7 @@ if [ ! -d ".doc" ]; then
   mkdir -p ".doc"
 fi
 echo $CONTENT >> .doc/app.json
+
 rm tmp.json
 
+git add .doc/app.json
