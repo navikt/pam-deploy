@@ -19,6 +19,7 @@ echo $CONTENT >> .doc/app.json
 
 BASE_CONTENT = echo $CONTENT | base64
 
+git add .doc/app.json
 curl \
   -X PUT \
   -H "Accept: application/vnd.github+json" \
@@ -29,5 +30,5 @@ curl \
 # rm tmp.json
 
 # git remote set-url origin "https://${GITHUB_ACTOR}:@github.com/${GITHUB_REPOSITORY}.git"
-# git add .doc/app.json
+
 # git push -f
