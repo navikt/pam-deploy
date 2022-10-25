@@ -26,18 +26,15 @@ jobs:
       id-token: write
     environment: ${{ inputs.CLUSTER }}
     steps:
+      # - name: get documentation contentfile
+      #   run: |
+      #     gh api -H "Accept: application/vnd.github.v3.raw" /repos/navikt/pam-repoinfo/contents/README.md
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-          repository: 'navikt/pam-repoinfo'
-          token: ${{ secrets.GITHUB_TOKEN }}
-          ref: 'main'
-      - name: get documentation contentfile
-        run: |
-          gh api -H "Accept: application/vnd.github.v3.raw" /repos/navikt/pam-repoinfo/contents/README.md
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Update Documentation
+      - name: Process Nais 
         uses: navikt/pam-deploy/actions/documentation@v2
         env:
           CLUSTER: ${{ inputs.CLUSTER }}
@@ -45,3 +42,13 @@ jobs:
           VAR: ${{ inputs.VAR }}
           VARS: ${{ inputs.VARS }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Commit files
+        run: |
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git commit -m "Add changes" -a
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
