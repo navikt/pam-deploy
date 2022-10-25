@@ -42,7 +42,7 @@ jobs:
           VAR: ${{ inputs.VAR }}
           VARS: ${{ inputs.VARS }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Commit files
+      # - name: Commit files
       # - name: Push changes
       #   uses: ad-m/github-push-action@master
       #   with:
