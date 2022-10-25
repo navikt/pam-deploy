@@ -22,3 +22,5 @@ rm tmp.json
 
 
 git add .doc/app.json
+git commit -m "Add changes" -a
+git push
