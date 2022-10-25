@@ -26,10 +26,10 @@ jobs:
       id-token: write
     environment: ${{ inputs.CLUSTER }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-          repository: 'navikt/pam-repoinfo.git'
+          repository: 'navikt/pam-repoinfo'
           token: ${{ secrets.GITHUB_TOKEN }}
           ref: 'main'
       - name: get documentation contentfile
