@@ -14,7 +14,7 @@ RUN go build -o /go
 
 FROM bash:5.0
 
-RUN apk add --no-cache curl jq sed git tzdata base64
+RUN apk add --no-cache curl jq sed git tzdata
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
