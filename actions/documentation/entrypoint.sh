@@ -17,15 +17,15 @@ if [ ! -d ".doc" ]; then
 fi
 echo $CONTENT >> .doc/app.json
 
-BASE_CONTENT=$(echo $CONTENT | base64)
+# BASE_CONTENT=$(echo $CONTENT | base64)
 
-git add .doc/app.json
-curl \
-  -X PUT \
-  -H "Accept: application/vnd.github+json" \
-  -H "Authorization: Bearer ${GITHUB_TOKEN}" \
-  https://api.github.com/repos/navikt/${GITHUB_REPOSITORY}/contents/.doc/app.json \
-  -d "{'message':'update','committer':{'name': 'GitHub Action', 'email':'action@github.com'},'content': ${BASE_CONTENT}}"
+# git add .doc/app.json
+# curl \
+#   -X PUT \
+#   -H "Accept: application/vnd.github+json" \
+#   -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+#   https://api.github.com/repos/navikt/${GITHUB_REPOSITORY}/contents/.doc/app.json \
+#   -d "{'message':'update','committer':{'name': 'GitHub Action', 'email':'action@github.com'},'content': ${BASE_CONTENT}}"
 
 # rm tmp.json
 
