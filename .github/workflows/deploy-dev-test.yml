@@ -26,11 +26,6 @@ jobs:
       id-token: write
     environment: ${{ inputs.CLUSTER }}
     steps:
-      # - name: get documentation contentfile
-      #   run: |
-      #     gh api -H "Accept: application/vnd.github.v3.raw" /repos/navikt/pam-repoinfo/contents/README.md
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
@@ -44,6 +39,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Commit files
         run: |
+          sudo chmod -R ugo+rwX .
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git commit -m "Add changes" -a
