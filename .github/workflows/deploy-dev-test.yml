@@ -26,11 +26,11 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
+          repository: 'navikt/pam-repoinfo'
+          token: ${{ secrets.GITHUB_TOKEN }}
       - name: get documentation contentfile
         run: |
-          gh api -H "Accept: application/vnd.github.v3.raw" /repos/navikt/pam-doc/contents/README.md
           gh api -H "Accept: application/vnd.github.v3.raw" /repos/navikt/pam-repoinfo/contents/README.md
-          gh api -H "Accept: application/vnd.github.v3.raw" /repos/navikt/pam-repoinfo/contents/repos.json
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Update Documentation
