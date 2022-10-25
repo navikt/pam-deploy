@@ -28,6 +28,7 @@ jobs:
           fetch-depth: 0
           repository: 'navikt/pam-repoinfo'
           token: ${{ secrets.GITHUB_TOKEN }}
+          ref: 'main'
       - name: get documentation contentfile
         run: |
           gh api -H "Accept: application/vnd.github.v3.raw" /repos/navikt/pam-repoinfo/contents/README.md
