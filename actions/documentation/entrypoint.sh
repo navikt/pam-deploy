@@ -21,5 +21,4 @@ rm tmp.json
 
 git remote set-url origin "https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
 git add .doc/app.json
-git commit -m "Add changes" -a
-git push
+
