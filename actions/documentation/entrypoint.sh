@@ -13,4 +13,9 @@ echo $CONTENT >> .doc/app.json
 
 rm tmp.json
 
+if [ -n "$GITHUB_WORKSPACE" ]; then
+  git config --global --add safe.directory $GITHUB_WORKSPACE
+  cd "$GITHUB_WORKSPACE" || exit
+fi
+
 git add .doc/app.json
