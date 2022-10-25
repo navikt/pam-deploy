@@ -21,22 +21,18 @@ on:
 jobs:
   deploy-dev:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
     environment: ${{ inputs.CLUSTER }}
+    permissions:
+      contents: write
     steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: Process Nais 
+      - name: Process nais doc
         uses: navikt/pam-deploy/actions/documentation@v2
         env:
           CLUSTER: ${{ inputs.CLUSTER }}
           RESOURCE: ${{ inputs.NAIS_RESOURCE }}
           VAR: ${{ inputs.VAR }}
           VARS: ${{ inputs.VARS }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: EndBug/add-and-commit@v9
         with:
           add: '.doc/app.json'
