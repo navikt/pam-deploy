@@ -39,7 +39,7 @@ jobs:
             mutation {
               createCommitOnBranch(input: {
                 branch: {
-                  repositoryNameWithOwner: "'$GITHUB_REPOSITORY_OWNER/$GITHUB_REPOSITORY'",
+                  repositoryNameWithOwner: "'$GITHUB_REPOSITORY'",
                   branchName: "'$GITHUB_REF_NAME'"
                 },
                 message: {
