@@ -29,7 +29,7 @@ jobs:
         with:
           fetch-depth: 0
       - run: |
-        printenv
+          printenv
       - name: Process nais doc
         uses: navikt/pam-deploy/actions/documentation@v2
         env:
