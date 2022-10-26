@@ -43,7 +43,7 @@ jobs:
                   branchName: "'$GITHUB_REF_NAME'"
                 },
                 message: {
-                  headline: "Hello from GraphQL!"
+                  headline: ".doc update for documentation. See https://pam.intern.nav.no/docs/repositories/ for more information"
                 },
                 fileChanges: {
                   additions: [
