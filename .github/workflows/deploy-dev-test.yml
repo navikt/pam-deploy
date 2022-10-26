@@ -42,7 +42,7 @@ jobs:
             mutation {
               createCommitOnBranch(input: {
                 branch: {
-                  repositoryNameWithOwner: "navikt/pam-doc",
+                  repositoryNameWithOwner: "navikt/pam-deploy",
                   branchName: "'$GITHUB_REF_NAME'"
                 },
                 message: {
