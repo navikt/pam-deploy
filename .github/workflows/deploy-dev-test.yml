@@ -35,31 +35,31 @@ jobs:
           # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: commit-push
         run: |
-          gh api graphql -f query='
+          gh api graphql -f query="
             mutation {
               createCommitOnBranch(input: {
                 branch: {
-                  repositoryNameWithOwner: "$GITHUB_REPOSITORY_OWNER/$GITHUB_REPOSITORY",
-                  branchName: "$GITHUB_REF_NAME"
+                  repositoryNameWithOwner: '$GITHUB_REPOSITORY_OWNER/$GITHUB_REPOSITORY',
+                  branchName: '$GITHUB_REF_NAME'
                 },
                 message: {
-                  headline: "Hello from GraphQL!"
+                  headline: 'Hello from GraphQL!'
                 },
                 fileChanges: {
                   additions: [
                     {
-                      path: "README2.md",
-                      contents: "aGVsbG8gd29ybGQK"
+                      path: 'README2.md',
+                      contents: 'aGVsbG8gd29ybGQK'
                     }
                   ]
                 },
-                expectedHeadOid : "$GITHUB_SHA"
+                expectedHeadOid : '$GITHUB_SHA'
               }) {
                 commit {
                   url
                 }
               }
-            }'
+            }"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
