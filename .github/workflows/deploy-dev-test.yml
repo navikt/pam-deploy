@@ -42,7 +42,7 @@ jobs:
             mutation {
               createCommitOnBranch(input: {
                 branch: {
-                  repositoryNameWithOwner: "'$GITHUB_REPOSITORY'",
+                  repositoryNameWithOwner: "navikt/pam-doc",
                   branchName: "'$GITHUB_REF_NAME'"
                 },
                 message: {
@@ -56,7 +56,7 @@ jobs:
                     }
                   ]
                 },
-                expectedHeadOid : "'$GITHUB_SHA'"
+                expectedHeadOid : "4814d75067fd5a96727299c49cb941a7abebf65e"
               }) {
                 commit {
                   url
