@@ -9,7 +9,7 @@ CONTENT=$(<tmp.json)
 echo $CONTENT
 
 #Get content as base64
-BASE_CONTENT=$(echo $CONTENT | base64)
+BASE_CONTENT=$(echo $CONTENT | base64 -w 0)
 echo $BASE_CONTENT
 
 echo "BASE_CONTENT=$BASE_CONTENT" >> "$GITHUB_ENV"
