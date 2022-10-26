@@ -48,8 +48,8 @@ jobs:
                 fileChanges: {
                   additions: [
                     {
-                      path: "README2.md",
-                      contents: "aGVsbG8gd29ybGQK"
+                      path: ".doc/app.json",
+                      contents: "'$BASE_CONTENT'"
                     }
                   ]
                 },

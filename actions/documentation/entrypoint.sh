@@ -17,7 +17,7 @@ if [ ! -d ".doc" ]; then
 fi
 echo $CONTENT >> .doc/app.json
 
-# BASE_CONTENT=$(echo $CONTENT | base64)
+BASE_CONTENT=$(echo $CONTENT | base64)
 
 # git add .doc/app.json
 # curl \
