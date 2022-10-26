@@ -25,6 +25,9 @@ jobs:
     permissions:
       contents: write
     steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - name: Process nais doc
         uses: navikt/pam-deploy/actions/documentation@v2
         env:
