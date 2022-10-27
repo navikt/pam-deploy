@@ -34,6 +34,8 @@ on:
         required: true
       SNYK_TOKEN:
         required: true
+      OPTIONAL_SECRET:
+        required: false
 jobs:
   deploy-dev:
     runs-on: ubuntu-latest
@@ -59,6 +61,8 @@ jobs:
       - name: Build and test
         run: |
           ./build.sh
+        env:
+          OPTIONAL_SECRET: ${{ secrets.OPTIONAL_SECRET }}
       - name: Snyk test
         if: ${{ inputs.SNYK_ENABLED }}
         run: snyk test --org=teampam --severity-threshold=high
