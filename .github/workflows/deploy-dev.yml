@@ -9,6 +9,10 @@ on:
         required: false
         type: boolean
         default: true
+      SNYK_ORG:
+        required: false
+        type: string
+        default: "teampam"
       JAVA_VERSION:
         required: false
         type: string
@@ -69,7 +73,7 @@ jobs:
           OPTIONAL_SECRET: ${{ secrets.OPTIONAL_SECRET }}
       - name: Snyk test
         if: ${{ inputs.SNYK_ENABLED }}
-        run: snyk test --org=teampam --severity-threshold=high
+        run: snyk test --org=${{ inputs.SNYK_ORG }} --severity-threshold=high
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
       - name: Pre-deploy
