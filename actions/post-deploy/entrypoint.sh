@@ -2,8 +2,11 @@
 set -e
 
 if [ -n "$GITHUB_WORKSPACE" ]; then
+  git config --global --add safe.directory $GITHUB_WORKSPACE
   cd "$GITHUB_WORKSPACE" || exit
 fi
+# security reasons
+
 
 if ! git describe --abbrev=0 --tags &>/dev/null; then
   FIRST_COMMIT=$(git rev-list --max-parents=0 HEAD)

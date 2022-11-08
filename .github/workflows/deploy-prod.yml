@@ -9,29 +9,36 @@ on:
         required: false
         type: string
         default: "naiserator-prod.json"
+      CLUSTER:
+        required: false
+        type: string
+        default: "prod-gcp"
     secrets:
       NAIS_DEPLOY_APIKEY:
         required: true
+env:
+  VERSION_TAG: ${{ github.event.release.tag_name }}
 
 jobs:
   deploy-prod:
     runs-on: ubuntu-latest
-    environment: prod-gcp
+    environment: ${{ inputs.CLUSTER }}
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          ref: ${{ env.VERSION_TAG }}
       - name: get release tag
-        env:
-          VERSION_TAG: ${{ github.event.release.tag_name }}
         run: |
           APPLICATION=$(echo $GITHUB_REPOSITORY | cut -d "/" -f 2)
           IMAGE=ghcr.io/$GITHUB_REPOSITORY:$VERSION_TAG
           echo "IMAGE=$IMAGE" >> $GITHUB_ENV
           echo $IMAGE
       - uses: nais/deploy/actions/deploy@v1
-        name: deploy to prod-gcp
+        name: deploy to ${{ inputs.CLUSTER }}
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-          CLUSTER: prod-gcp
+          CLUSTER: ${{ inputs.CLUSTER }}
           RESOURCE: ${{ inputs.NAIS_RESOURCE }}
           VARS: ${{ inputs.NAIS_VARS }}
       - name: post-production
