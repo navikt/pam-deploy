@@ -36,18 +36,18 @@ jobs:
     runs-on: ubuntu-latest
     environment: dev-gcp
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: snyk/actions/setup@master
       - name: Setup java
         if: ${{ inputs.LANGUAGE == 'java' }}
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
           java-version: ${{ inputs.JAVA_VERSION }}
           cache: ${{ inputs.BUILD_CACHE }}
       - name: Setup Node
         if: ${{ inputs.LANGUAGE == 'node' }}
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ inputs.NODE_VERSION }}
           cache: ${{ inputs.BUILD_CACHE }}

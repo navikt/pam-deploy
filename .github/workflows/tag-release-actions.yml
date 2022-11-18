@@ -13,7 +13,7 @@ jobs:
     name: Tag/Release the github actions
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v3
       - name: push tag version
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -26,7 +26,7 @@ jobs:
     needs: tag-and-release
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v3
       - name: test pre-deploy
         uses: navikt/pam-deploy/actions/pre-deploy@v2
         env:
