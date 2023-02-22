@@ -9,6 +9,10 @@ on:
         required: false
         type: boolean
         default: true
+      JAVA_DISTRIBUTION:
+        required: false
+        type: string
+        default: "temurin"
       JAVA_VERSION:
         required: false
         type: string
@@ -42,7 +46,7 @@ jobs:
         if: ${{ inputs.LANGUAGE == 'java' }}
         uses: actions/setup-java@v3
         with:
-          distribution: 'zulu'
+          distribution: ${{ inputs.JAVA_DISTRIBUTION }}
           java-version: ${{ inputs.JAVA_VERSION }}
           cache: ${{ inputs.BUILD_CACHE }}
       - name: Setup Node
