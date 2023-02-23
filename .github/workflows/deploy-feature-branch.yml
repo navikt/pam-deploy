@@ -50,6 +50,8 @@ jobs:
     environment: dev-gcp
     steps:
       - uses: actions/checkout@v3
+      - uses: docker/setup-buildx-action@v2
+        name: Set up Docker Buildx
       - uses: snyk/actions/setup@master
       - name: Setup java
         if: ${{ inputs.LANGUAGE == 'java' }}
