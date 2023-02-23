@@ -80,7 +80,7 @@ jobs:
           registry: ghcr.io
           username: ${{ github.REPOSITORY }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build and push docker image
+      - name: Setup docker image and version name
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -89,9 +89,6 @@ jobs:
           VERSION_TAG=${GITHUB_REF##*/}-$SHORT_SHA
           IMAGE=ghcr.io/$GITHUB_REPOSITORY:$VERSION_TAG
           echo "IMAGE=$IMAGE" >> $GITHUB_ENV
-          docker build . --pull -t $IMAGE
-          echo "$GITHUB_TOKEN" | docker login --username "$GITHUB_REPOSITORY" --password-stdin ghcr.io
-          docker push $IMAGE
       - name: Build and push docker image
         uses: docker/build-push-action@v4
         with:
