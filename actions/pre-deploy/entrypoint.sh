@@ -29,13 +29,6 @@ if [ -z "$DOCKER_IMAGE" ]; then
 fi
 IMAGE=$DOCKER_IMAGE:$VERSION_TAG
 
-echo "building and push docker image"
-echo $GITHUB_TOKEN | docker login --username $GITHUB_REPOSITORY --password-stdin $DOCKER_REPO
-if [ -z "$DRY_RUN" ]; then
-  docker build . --pull -t $IMAGE
-  docker push $IMAGE
-fi
-
 echo "VERSION_TAG=$VERSION_TAG" >> "$GITHUB_ENV"
 echo "APPLICATION=$APPLICATION" >> "$GITHUB_ENV"
 echo "IMAGE=$IMAGE" >> "$GITHUB_ENV"
