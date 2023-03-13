@@ -99,6 +99,8 @@ jobs:
           tags: ${{ env.IMAGE }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          secrets: |
+            "optional_secret=${{ secrets.OPTIONAL_SECRET }}"
         env:
           OPTIONAL_SECRET: ${{ secrets.OPTIONAL_SECRET }}
       - name: Deploy to dev-gcp
