@@ -52,6 +52,8 @@ on:
         required: true
       OPTIONAL_SECRET:
         required: false
+      NAIS_WORKLOAD_IDENTITY_PROVIDER:
+        required: true
 jobs:
   deploy-dev:
     runs-on: ubuntu-latest
