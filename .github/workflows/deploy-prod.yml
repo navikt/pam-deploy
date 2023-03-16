@@ -13,6 +13,10 @@ on:
         required: false
         type: string
         default: "prod-gcp"
+      TEAM:
+        required: false
+        type: string
+        default: "teampam"
     secrets:
       NAIS_DEPLOY_APIKEY:
         required: true
@@ -28,12 +32,11 @@ jobs:
         with:
           fetch-depth: 0
           ref: ${{ env.VERSION_TAG }}
-      - name: get release tag
-        run: |
-          APPLICATION=$(echo $GITHUB_REPOSITORY | cut -d "/" -f 2)
-          IMAGE=ghcr.io/$GITHUB_REPOSITORY:$VERSION_TAG
-          echo "IMAGE=$IMAGE" >> $GITHUB_ENV
-          echo $IMAGE
+      - name: pre-production
+        uses: navikt/pam-deploy/actions/pre-production@v4
+        env:
+          PROJECT_ID: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
+          TEAM: ${{ inputs.TEAM }}
       - uses: nais/deploy/actions/deploy@v1
         name: deploy to ${{ inputs.CLUSTER }}
         env:
@@ -42,6 +45,6 @@ jobs:
           RESOURCE: ${{ inputs.NAIS_RESOURCE }}
           VARS: ${{ inputs.NAIS_VARS }}
       - name: post-production
-        uses: navikt/pam-deploy/actions/post-production@v2
+        uses: navikt/pam-deploy/actions/post-production@v4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

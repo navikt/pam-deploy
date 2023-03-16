@@ -13,6 +13,10 @@ on:
         required: false
         type: string
         default: "teampam"
+      TEAM:
+        required: false
+        type: string
+        default: "teampam"
       JAVA_DISTRIBUTION:
         required: false
         type: string
@@ -82,26 +86,20 @@ jobs:
         run: snyk test --org=${{ inputs.SNYK_ORG }} --severity-threshold=high
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-      - uses: docker/login-action@v2
-        name: Docker login
-        with:
-          registry: ghcr.io
-          username: ${{ github.REPOSITORY }}
-          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Pre-deploy
-        uses: navikt/pam-deploy/actions/pre-deploy@v3
+        uses: navikt/pam-deploy/actions/pre-deploy@v4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build and push docker image
-        uses: docker/build-push-action@v4
+          PROJECT_ID: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
+          TEAM: ${{ inputs.TEAM }}
+      - name: docker-build-push
+        uses: nais/docker-build-push@v0
+        id: docker-build-push
         with:
-          context: .
-          push: true
-          tags: ${{ env.IMAGE }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          secrets: |
-            "optional_secret=${{ secrets.OPTIONAL_SECRET }}"
+          team: ${{ inputs.TEAM }}
+          tag: ${{ env.VERSION_TAG }}
+          identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
+          project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
         env:
           OPTIONAL_SECRET: ${{ secrets.OPTIONAL_SECRET }}
       - name: Deploy to ${{ inputs.CLUSTER }}
@@ -112,7 +110,7 @@ jobs:
           RESOURCE: ${{ inputs.NAIS_RESOURCE }}
           VARS: ${{ inputs.NAIS_VARS }}
       - name: Post-deploy
-        uses: navikt/pam-deploy/actions/post-deploy@v2
+        uses: navikt/pam-deploy/actions/post-deploy@v4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Draft release
