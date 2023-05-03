@@ -61,8 +61,10 @@ on:
 jobs:
   deploy-dev:
     permissions:
-      contents: "write"
-      id-token: "write"
+      contents: write
+      id-token: write
+      security-events: write
+      actions: read
     runs-on: ubuntu-latest
     env:
       CODEQL_LANGUAGE: ${{ (inputs.LANGUAGE == 'node' && 'javascript') || inputs.LANGUAGE }}
