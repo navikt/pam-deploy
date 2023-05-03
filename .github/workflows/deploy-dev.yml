@@ -83,7 +83,7 @@ jobs:
         uses: github/codeql-action/init@v2
         with:
           external-repository-token: ${{ secrets.GITHUB_TOKEN }}
-          languages: ${{CODEQL_LANGUAGE}}
+          languages: $CODEQL_LANGUAGE
       - name: Setup java
         if: ${{ inputs.LANGUAGE == 'java' }}
         uses: actions/setup-java@v3
@@ -111,7 +111,7 @@ jobs:
         if: ${{ inputs.CODEQL_ENABLED }}
         uses: github/codeql-action/analyze@v2
         with:
-          category: "/language:${{CODEQL_LANGUAGE}}"
+          category: "/language:$CODEQL_LANGUAGE"
       - name: Pre-deploy
         uses: navikt/pam-deploy/actions/pre-deploy@v4
         env:
