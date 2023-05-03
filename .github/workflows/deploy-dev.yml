@@ -5,6 +5,10 @@ on:
         required: false
         type: string
         default: "java"
+      CODEQL_ENABLED:
+        required: false
+        type: boolean
+        default: false
       SNYK_ENABLED:
         required: false
         type: boolean
@@ -60,6 +64,8 @@ jobs:
       contents: "write"
       id-token: "write"
     runs-on: ubuntu-latest
+    env:
+      CODEQL_LANGUAGE: ${{ (inputs.LANGUAGE == 'node' && 'javascript') || inputs.LANGUAGE }}
     environment: ${{ inputs.CLUSTER }}
     steps:
       - uses: actions/checkout@v3
@@ -68,6 +74,11 @@ jobs:
       - uses: docker/setup-buildx-action@v2
         name: Set up Docker Buildx
       - uses: snyk/actions/setup@master
+      - name: Setup CodeQL
+        if: ${{ inputs.CODEQL_ENABLED }}
+        uses: github/codeql-action/init@v2
+        with:
+          languages: $CODEQL_LANGUAGE
       - name: Setup java
         if: ${{ inputs.LANGUAGE == 'java' }}
         uses: actions/setup-java@v3
@@ -91,6 +102,11 @@ jobs:
         run: snyk test --org=${{ inputs.SNYK_ORG }} --severity-threshold=high
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      - name: Perform CodeQL Analysis
+        if: ${{ inputs.CODEQL_ENABLED }}
+        uses: github/codeql-action/analyze@v2
+        with:
+          category: "/language:$CODEQL_LANGUAGE"
       - name: Pre-deploy
         uses: navikt/pam-deploy/actions/pre-deploy@v4
         env:
