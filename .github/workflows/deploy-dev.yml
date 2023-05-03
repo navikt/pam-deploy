@@ -58,6 +58,8 @@ on:
         required: false
       NAIS_WORKLOAD_IDENTITY_PROVIDER:
         required: true
+      CODEQL_EXTERNAL_REPO_TOKEN:
+        required: false
 jobs:
   deploy-dev:
     permissions:
@@ -80,6 +82,7 @@ jobs:
         if: ${{ inputs.CODEQL_ENABLED }}
         uses: github/codeql-action/init@v2
         with:
+          external-repository-token: ${{ secrets.CODEQL_EXTERNAL_REPO_TOKEN }}
           languages: $CODEQL_LANGUAGE
       - name: Setup java
         if: ${{ inputs.LANGUAGE == 'java' }}
