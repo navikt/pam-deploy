@@ -8,7 +8,7 @@ on:
       CODEQL_ENABLED:
         required: false
         type: boolean
-        default: false
+        default: true
       SNYK_ENABLED:
         required: false
         type: boolean
