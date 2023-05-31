@@ -1,4 +1,4 @@
-FROM docker:20.10.7
+FROM docker:20.10.24
 
 RUN apk add --no-cache bash curl jq sed git tzdata
 
