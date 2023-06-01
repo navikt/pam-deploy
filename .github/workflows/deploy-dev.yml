@@ -44,6 +44,8 @@ on:
     secrets:
       NAIS_DEPLOY_APIKEY:
         required: true
+      SNYK_TOKEN:
+        required: false
       OPTIONAL_SECRET:
         required: false
       NAIS_WORKLOAD_IDENTITY_PROVIDER:
