@@ -108,7 +108,6 @@ jobs:
           category: "/language:${{ (inputs.LANGUAGE == 'node' && 'javascript') || inputs.LANGUAGE }}"
       - name: Pre-deploy
         uses: navikt/pam-deploy/actions/pre-deploy@v4
-        working-directory: ${{ inputs.WORKING_DIRECTORY }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PROJECT_ID: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
