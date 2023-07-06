@@ -79,14 +79,12 @@ jobs:
       - name: Setup CodeQL
         if: ${{ inputs.CODEQL_ENABLED }}
         uses: github/codeql-action/init@v2
-        working-directory: ${{ WORKING_DIRECTORY }}
         with:
           external-repository-token: ${{ secrets.GITHUB_TOKEN }}
           languages: ${{ (inputs.LANGUAGE == 'node' && 'javascript') || inputs.LANGUAGE }}
       - name: Setup java
         if: ${{ inputs.LANGUAGE == 'java' }}
         uses: actions/setup-java@v3
-        working-directory: ${{ WORKING_DIRECTORY }}
         with:
           distribution: ${{ inputs.JAVA_DISTRIBUTION }}
           java-version: ${{ inputs.JAVA_VERSION }}
@@ -94,7 +92,6 @@ jobs:
       - name: Setup Node
         if: ${{ inputs.LANGUAGE == 'node' }}
         uses: actions/setup-node@v3
-        working-directory: ${{ WORKING_DIRECTORY }}
         with:
           node-version: ${{ inputs.NODE_VERSION }}
           cache: ${{ inputs.BUILD_CACHE }}
