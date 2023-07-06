@@ -131,7 +131,6 @@ jobs:
           VARS: ${{ inputs.NAIS_VARS }}
       - name: Post-deploy
         uses: navikt/pam-deploy/actions/post-deploy@v4
-        working-directory: ${{ inputs.WORKING_DIRECTORY }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Draft release
