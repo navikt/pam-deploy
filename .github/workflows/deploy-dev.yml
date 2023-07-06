@@ -41,6 +41,10 @@ on:
         required: false
         type: string
         default: "dev-gcp"
+      BUILD_SCRIPT:
+        required: false
+        type: string
+        default: "./build.sh"
     secrets:
       NAIS_DEPLOY_APIKEY:
         required: true
@@ -88,7 +92,7 @@ jobs:
           cache: ${{ inputs.BUILD_CACHE }}
       - name: Build and test
         run: |
-          ./build.sh
+          ${{ inputs.BUILD_SCRIPT }}
         env:
           OPTIONAL_SECRET: ${{ secrets.OPTIONAL_SECRET }}
       - name: Perform CodeQL Analysis
