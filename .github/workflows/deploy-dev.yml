@@ -114,7 +114,6 @@ jobs:
           TEAM: ${{ inputs.TEAM }}
       - name: docker-build-push
         uses: nais/docker-build-push@v0
-        working-directory: ${{ inputs.WORKING_DIRECTORY }}
         id: docker-build-push
         with:
           team: ${{ inputs.TEAM }}
