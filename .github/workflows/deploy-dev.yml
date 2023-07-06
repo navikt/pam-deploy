@@ -75,7 +75,7 @@ jobs:
           fetch-depth: 0
       - uses: docker/setup-buildx-action@v2
         name: Set up Docker Buildx
-        working-directory: ${{ WORKING_DIRECTORY }}
+        working-directory: ${{ inputs.WORKING_DIRECTORY }}
       - name: Setup CodeQL
         if: ${{ inputs.CODEQL_ENABLED }}
         uses: github/codeql-action/init@v2
@@ -98,25 +98,25 @@ jobs:
       - name: Build and test
         run: |
           ${{ inputs.BUILD_SCRIPT }}
-        working-directory: ${{ WORKING_DIRECTORY }}
+        working-directory: ${{ inputs.WORKING_DIRECTORY }}
         env:
           OPTIONAL_SECRET: ${{ secrets.OPTIONAL_SECRET }}
       - name: Perform CodeQL Analysis
         if: ${{ inputs.CODEQL_ENABLED }}
         uses: github/codeql-action/analyze@v2
-        working-directory: ${{ WORKING_DIRECTORY }}
+        working-directory: ${{ inputs.WORKING_DIRECTORY }}
         with:
           category: "/language:${{ (inputs.LANGUAGE == 'node' && 'javascript') || inputs.LANGUAGE }}"
       - name: Pre-deploy
         uses: navikt/pam-deploy/actions/pre-deploy@v4
-        working-directory: ${{ WORKING_DIRECTORY }}
+        working-directory: ${{ inputs.WORKING_DIRECTORY }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PROJECT_ID: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
           TEAM: ${{ inputs.TEAM }}
       - name: docker-build-push
         uses: nais/docker-build-push@v0
-        working-directory: ${{ WORKING_DIRECTORY }}
+        working-directory: ${{ inputs.WORKING_DIRECTORY }}
         id: docker-build-push
         with:
           team: ${{ inputs.TEAM }}
@@ -127,7 +127,7 @@ jobs:
           OPTIONAL_SECRET: ${{ secrets.OPTIONAL_SECRET }}
       - name: Deploy to ${{ inputs.CLUSTER }}
         uses: nais/deploy/actions/deploy@v1
-        working-directory: ${{ WORKING_DIRECTORY }}
+        working-directory: ${{ inputs.WORKING_DIRECTORY }}
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: ${{ inputs.CLUSTER }}
@@ -135,12 +135,12 @@ jobs:
           VARS: ${{ inputs.NAIS_VARS }}
       - name: Post-deploy
         uses: navikt/pam-deploy/actions/post-deploy@v4
-        working-directory: ${{ WORKING_DIRECTORY }}
+        working-directory: ${{ inputs.WORKING_DIRECTORY }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Draft release
         uses: ncipollo/release-action@v1
-        working-directory: ${{ WORKING_DIRECTORY }}
+        working-directory: ${{ inputs.WORKING_DIRECTORY }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
