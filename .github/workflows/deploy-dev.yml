@@ -135,7 +135,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Draft release
         uses: ncipollo/release-action@v1
-        working-directory: ${{ inputs.WORKING_DIRECTORY }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
