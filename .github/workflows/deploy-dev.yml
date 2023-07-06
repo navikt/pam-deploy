@@ -104,7 +104,6 @@ jobs:
       - name: Perform CodeQL Analysis
         if: ${{ inputs.CODEQL_ENABLED }}
         uses: github/codeql-action/analyze@v2
-        working-directory: ${{ inputs.WORKING_DIRECTORY }}
         with:
           category: "/language:${{ (inputs.LANGUAGE == 'node' && 'javascript') || inputs.LANGUAGE }}"
       - name: Pre-deploy
