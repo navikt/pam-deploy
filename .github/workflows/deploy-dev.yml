@@ -75,7 +75,6 @@ jobs:
           fetch-depth: 0
       - uses: docker/setup-buildx-action@v2
         name: Set up Docker Buildx
-        working-directory: ${{ inputs.WORKING_DIRECTORY }}
       - name: Setup CodeQL
         if: ${{ inputs.CODEQL_ENABLED }}
         uses: github/codeql-action/init@v2
