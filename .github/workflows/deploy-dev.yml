@@ -124,7 +124,6 @@ jobs:
           OPTIONAL_SECRET: ${{ secrets.OPTIONAL_SECRET }}
       - name: Deploy to ${{ inputs.CLUSTER }}
         uses: nais/deploy/actions/deploy@v1
-        working-directory: ${{ inputs.WORKING_DIRECTORY }}
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: ${{ inputs.CLUSTER }}
