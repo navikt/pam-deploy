@@ -120,7 +120,6 @@ jobs:
           identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
           project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
           dockerfile: "${{ inputs.WORKING_DIRECTORY }}Dockerfile"
-          docker_context: ${{ inputs.WORKING_DIRECTORY }}
         env:
           OPTIONAL_SECRET: ${{ secrets.OPTIONAL_SECRET }}
       - name: Deploy to ${{ inputs.CLUSTER }}
