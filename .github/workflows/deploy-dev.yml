@@ -60,6 +60,10 @@ on:
         required: true
       CODEQL_EXTERNAL_REPO_TOKEN:
         required: false
+    outputs:
+      image:
+        description: "Image from nais build push action"
+        value: ${{ jobs.deploy-dev.outputs.image }}
 jobs:
   deploy-dev:
     permissions:
@@ -69,6 +73,8 @@ jobs:
       actions: read
     runs-on: ubuntu-latest
     environment: ${{ inputs.CLUSTER }}
+    outputs:
+      image: ${{ steps.docker-build-push.outputs.image }}
     steps:
       - uses: actions/checkout@v3
         with:
