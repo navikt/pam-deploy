@@ -17,7 +17,7 @@ on:
         required: false
         type: string
         default: "teampam"
-      APPLICATION:
+      IMAGE_SUFFIX:
         required: false
         type: string
     secrets:
@@ -40,7 +40,7 @@ jobs:
         env:
           PROJECT_ID: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
           TEAM: ${{ inputs.TEAM }}
-          APPLICATION: ${{ inputs.APPLICATION }}
+          IMAGE_SUFFIX: ${{ inputs.IMAGE_SUFFIX }}
       - uses: nais/deploy/actions/deploy@v1
         name: deploy to ${{ inputs.CLUSTER }}
         env:

@@ -49,7 +49,7 @@ on:
         required: false
         type: string
         default: "./"
-      APPLICATION:
+      IMAGE_SUFFIX:
         required: false
         type: string
     secrets:
@@ -114,7 +114,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PROJECT_ID: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
           TEAM: ${{ inputs.TEAM }}
-          APPLICATION: ${{ inputs.APPLICATION }}
+          IMAGE_SUFFIX: ${{ inputs.IMAGE_SUFFIX }}
       - name: docker-build-push
         uses: nais/docker-build-push@v0
         id: docker-build-push
@@ -124,6 +124,7 @@ jobs:
           identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
           project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
           dockerfile: "${{ inputs.WORKING_DIRECTORY }}Dockerfile"
+          image_suffix: ${{ inputs.IMAGE_SUFFIX }}
           build_secrets: |
             "optional_secret=${{ secrets.OPTIONAL_SECRET }}"
       - name: Deploy to ${{ inputs.CLUSTER }}
