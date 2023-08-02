@@ -114,6 +114,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PROJECT_ID: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
           TEAM: ${{ inputs.TEAM }}
+          APPLICATION: ${{ inputs.APPLICATION }}
       - name: docker-build-push
         uses: nais/docker-build-push@v0
         id: docker-build-push
