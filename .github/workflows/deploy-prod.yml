@@ -17,6 +17,9 @@ on:
         required: false
         type: string
         default: "teampam"
+      APPLICATION:
+        required: false
+        type: string
     secrets:
       NAIS_DEPLOY_APIKEY:
         required: true
