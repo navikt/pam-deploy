@@ -18,7 +18,10 @@ while read -r id; do
   fi
 done < <(curl -s -H "Authorization: token $GITHUB_TOKEN" "$GITHUB_URL/actions/runs?event=push&status=in_progress&branch=master" | jq -r '.workflow_runs[].id')
 
-APPLICATION=$(echo $GITHUB_REPOSITORY | cut -d "/" -f 2)
+if [ -z "$APPLICATION" ]; then
+  APPLICATION=$(echo $GITHUB_REPOSITORY | cut -d "/" -f 2)
+fi
+
 if [ -z "$VERSION_TAG" ]; then
   VERSION_TAG=$(TZ=Europe/Oslo date +"%y.%j.%H%M%S")
 else
