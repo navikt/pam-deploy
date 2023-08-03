@@ -144,7 +144,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag: ${{ env.VERSION_TAG }}
-          name: ${{ env.APPLICATION }} ${{ env.VERSION_TAG }}
+          name: ${{ env.DRAFT_NAME }}
           body: ${{ env.CHANGE_LOG }}
           draft: true
           prerelease: false
