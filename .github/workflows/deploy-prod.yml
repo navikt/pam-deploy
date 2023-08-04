@@ -52,3 +52,4 @@ jobs:
         uses: navikt/pam-deploy/actions/post-production@v4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          IMAGE_SUFFIX: ${{ inputs.IMAGE_SUFFIX }}
