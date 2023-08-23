@@ -1,0 +1,74 @@
+name: "CodeQL"
+
+on:
+  workflow_call:
+    inputs:
+      LANGUAGE:
+        required: true
+        type: string
+      JAVA_DISTRIBUTION:
+        required: false
+        type: string
+      JAVA_VERSION:
+        required: false
+        type: string
+      NODE_VERSION:
+        required: false
+        type: string
+      BUILD_CACHE:
+        required: true
+        type: string
+      BUILD_SCRIPT:
+        required: true
+        type: string
+      WORKING_DIRECTORY:
+        required: true
+        type: string
+      IMAGE_SUFFIX:
+        required: false
+        type: string
+    secrets:
+      OPTIONAL_SECRET:
+        required: false
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      security-events: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Setup CodeQL
+        if: ${{ inputs.CODEQL_ENABLED }}
+        uses: github/codeql-action/init@v2
+        with:
+          external-repository-token: ${{ secrets.GITHUB_TOKEN }}
+          languages: ${{ (inputs.LANGUAGE == 'node' && 'javascript') || inputs.LANGUAGE }}
+      - name: Setup java
+        if: ${{ inputs.LANGUAGE == 'java' }}
+        uses: actions/setup-java@v3
+        with:
+          distribution: ${{ inputs.JAVA_DISTRIBUTION }}
+          java-version: ${{ inputs.JAVA_VERSION }}
+          cache: ${{ inputs.BUILD_CACHE }}
+      - name: Setup Node
+        if: ${{ inputs.LANGUAGE == 'node' }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ inputs.NODE_VERSION }}
+          cache: ${{ inputs.BUILD_CACHE }}
+      - name: Build and test
+        run: |
+          ${{ inputs.BUILD_SCRIPT }}
+        working-directory: ${{ inputs.WORKING_DIRECTORY }}
+        env:
+          OPTIONAL_SECRET: ${{ secrets.OPTIONAL_SECRET }}
+      - name: Perform CodeQL Analysis
+        if: ${{ inputs.CODEQL_ENABLED }}
+        uses: github/codeql-action/analyze@v2
+        with:
+          category: "/language:${{ (inputs.LANGUAGE == 'node' && 'javascript') || inputs.LANGUAGE }}"

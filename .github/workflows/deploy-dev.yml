@@ -61,8 +61,6 @@ on:
         required: false
       NAIS_WORKLOAD_IDENTITY_PROVIDER:
         required: true
-      CODEQL_EXTERNAL_REPO_TOKEN:
-        required: false
     outputs:
       image:
         description: "Image from nais build push action"
@@ -84,12 +82,6 @@ jobs:
           fetch-depth: 0
       - uses: docker/setup-buildx-action@v2
         name: Set up Docker Buildx
-      - name: Setup CodeQL
-        if: ${{ inputs.CODEQL_ENABLED }}
-        uses: github/codeql-action/init@v2
-        with:
-          external-repository-token: ${{ secrets.GITHUB_TOKEN }}
-          languages: ${{ (inputs.LANGUAGE == 'node' && 'javascript') || inputs.LANGUAGE }}
       - name: Setup java
         if: ${{ inputs.LANGUAGE == 'java' }}
         uses: actions/setup-java@v3
@@ -109,11 +101,6 @@ jobs:
         working-directory: ${{ inputs.WORKING_DIRECTORY }}
         env:
           OPTIONAL_SECRET: ${{ secrets.OPTIONAL_SECRET }}
-      - name: Perform CodeQL Analysis
-        if: ${{ inputs.CODEQL_ENABLED }}
-        uses: github/codeql-action/analyze@v2
-        with:
-          category: "/language:${{ (inputs.LANGUAGE == 'node' && 'javascript') || inputs.LANGUAGE }}"
       - name: Pre-deploy
         uses: navikt/pam-deploy/actions/pre-deploy@v4
         env:
@@ -154,3 +141,17 @@ jobs:
           body: ${{ env.CHANGE_LOG }}
           draft: true
           prerelease: false
+  CodeQL:
+    if: ${{ inputs.CODEQL_ENABLED }}
+    uses: navikt/pam-deploy/.github/workflows/codeql.yml@v4
+    with:
+      LANGUAGE: ${{ inputs.LANGUAGE }}
+      JAVA_DISTRIBUTION: ${{ inputs.JAVA_DISTRIBUTION }}
+      JAVA_VERSION: ${{ inputs.JAVA_VERSION }}
+      NODE_VERSION: ${{ inputs.NODE_VERSION }}
+      BUILD_CACHE: ${{ inputs.BUILD_CACHE }}
+      BUILD_SCRIPT: ${{ inputs.BUILD_SCRIPT }}
+      WORKING_DIRECTORY: ${{ inputs.WORKING_DIRECTORY }}
+      IMAGE_SUFFIX: ${{ inputs.IMAGE_SUFFIX }}
+    secrets:
+      OPTIONAL_SECRET: ${{ secrets.OPTIONAL_SECRET }}
