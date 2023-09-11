@@ -52,6 +52,10 @@ on:
       IMAGE_SUFFIX:
         required: false
         type: string
+      SKIP_DRAFT_RELEASE:
+        required: false
+        type: boolean
+        default: false
     secrets:
       NAIS_DEPLOY_APIKEY:
         required: true
@@ -132,6 +136,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Draft release
+        if: ${{ !inputs.SKIP_DRAFT_RELEASE }}
         uses: ncipollo/release-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
