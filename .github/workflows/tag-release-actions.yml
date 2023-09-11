@@ -10,6 +10,8 @@ on:
       - master
 jobs:
   tag-and-release:
+    permissions:
+      contents: write
     name: Tag/Release the github actions
     runs-on: ubuntu-latest
     steps:
