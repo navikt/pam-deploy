@@ -106,7 +106,7 @@ jobs:
         env:
           OPTIONAL_SECRET: ${{ secrets.OPTIONAL_SECRET }}
       - name: Pre-deploy
-        uses: navikt/pam-deploy/actions/pre-deploy@v4
+        uses: navikt/pam-deploy/actions/pre-deploy@v5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PROJECT_ID: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
@@ -132,7 +132,7 @@ jobs:
           RESOURCE: ${{ inputs.NAIS_RESOURCE }}
           VARS: ${{ inputs.NAIS_VARS }}
       - name: Post-deploy
-        uses: navikt/pam-deploy/actions/post-deploy@v4
+        uses: navikt/pam-deploy/actions/post-deploy@v5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Draft release
@@ -148,7 +148,7 @@ jobs:
           prerelease: false
   CodeQL:
     if: ${{ inputs.CODEQL_ENABLED }}
-    uses: navikt/pam-deploy/.github/workflows/codeql.yml@v4
+    uses: navikt/pam-deploy/.github/workflows/codeql.yml@v5
     with:
       LANGUAGE: ${{ inputs.LANGUAGE }}
       JAVA_DISTRIBUTION: ${{ inputs.JAVA_DISTRIBUTION }}
