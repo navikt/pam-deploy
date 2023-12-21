@@ -57,8 +57,6 @@ on:
         type: boolean
         default: false
     secrets:
-      NAIS_DEPLOY_APIKEY:
-        required: true
       SNYK_TOKEN:
         required: false
       OPTIONAL_SECRET:
@@ -127,9 +125,8 @@ jobs:
           build_secrets: |
             "optional_secret=${{ secrets.OPTIONAL_SECRET }}"
       - name: Deploy to ${{ inputs.CLUSTER }}
-        uses: nais/deploy/actions/deploy@v1
+        uses: nais/deploy/actions/deploy@v2
         env:
-          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: ${{ inputs.CLUSTER }}
           RESOURCE: ${{ inputs.NAIS_RESOURCE }}
           VARS: ${{ inputs.NAIS_VARS }}

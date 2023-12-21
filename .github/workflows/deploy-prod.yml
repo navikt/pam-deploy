@@ -20,9 +20,6 @@ on:
       IMAGE_SUFFIX:
         required: false
         type: string
-    secrets:
-      NAIS_DEPLOY_APIKEY:
-        required: true
 env:
   VERSION_TAG: ${{ github.event.release.tag_name }}
 
@@ -41,10 +38,9 @@ jobs:
           PROJECT_ID: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
           TEAM: ${{ inputs.TEAM }}
           IMAGE_SUFFIX: ${{ inputs.IMAGE_SUFFIX }}
-      - uses: nais/deploy/actions/deploy@v1
+      - uses: nais/deploy/actions/deploy@v2
         name: deploy to ${{ inputs.CLUSTER }}
         env:
-          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: ${{ inputs.CLUSTER }}
           RESOURCE: ${{ inputs.NAIS_RESOURCE }}
           VARS: ${{ inputs.NAIS_VARS }}
