@@ -30,7 +30,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: test pre-deploy
-        uses: navikt/pam-deploy/actions/pre-deploy@v5
+        uses: navikt/pam-deploy/actions/pre-deploy@v7
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DRY_RUN: true
@@ -40,12 +40,12 @@ jobs:
           echo $IMAGE
           echo $APPLICATION
       - name: test post-deploy
-        uses: navikt/pam-deploy/actions/post-deploy@v5
+        uses: navikt/pam-deploy/actions/post-deploy@v7
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DRY_RUN: true
       - name: test post-production
-        uses: navikt/pam-deploy/actions/post-production@v5
+        uses: navikt/pam-deploy/actions/post-production@v7
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DRY_RUN: true
