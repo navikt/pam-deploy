@@ -39,6 +39,7 @@ jobs:
           echo $VERSION_TAG
           echo $IMAGE
           echo $APPLICATION
+          echo $DRAFTS_MAX
       - name: test post-deploy
         uses: navikt/pam-deploy/actions/post-deploy@v7
         env:
