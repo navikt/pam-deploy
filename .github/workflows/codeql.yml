@@ -69,7 +69,7 @@ jobs:
         uses: gradle/actions/dependency-submission@v3
       - name: Maven Dependency Submission
         if: ${{ inputs.LANGUAGE == 'java' && inputs.BUILD_CACHE == 'maven'}}
-        uses: advanced-security/maven-dependency-submission-action@v4
+        uses: advanced-security/maven-dependency-submission-action@v4.0.0
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
         with:
