@@ -41,7 +41,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Setup CodeQL
-        uses: github/codeql-action/init@v2
+        uses: github/codeql-action/init@v3
         with:
           external-repository-token: ${{ secrets.GITHUB_TOKEN }}
           languages: ${{ (inputs.LANGUAGE == 'node' && 'javascript') || inputs.LANGUAGE }}
@@ -71,6 +71,6 @@ jobs:
         if: ${{ inputs.LANGUAGE == 'java' && inputs.BUILD_CACHE == 'maven'}}
         uses: advanced-security/maven-dependency-submission-action@v4.0.0
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
+        uses: github/codeql-action/analyze@v3
         with:
           category: "/language:${{ (inputs.LANGUAGE == 'node' && 'javascript') || inputs.LANGUAGE }}"
