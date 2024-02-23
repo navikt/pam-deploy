@@ -28,12 +28,12 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ inputs.CLUSTER }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           ref: ${{ env.VERSION_TAG }}
       - name: pre-production
-        uses: navikt/pam-deploy/actions/pre-production@v5
+        uses: navikt/pam-deploy/actions/pre-production@v7
         env:
           PROJECT_ID: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
           TEAM: ${{ inputs.TEAM }}
@@ -45,7 +45,7 @@ jobs:
           RESOURCE: ${{ inputs.NAIS_RESOURCE }}
           VARS: ${{ inputs.NAIS_VARS }}
       - name: post-production
-        uses: navikt/pam-deploy/actions/post-production@v5
+        uses: navikt/pam-deploy/actions/post-production@v7
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           IMAGE_SUFFIX: ${{ inputs.IMAGE_SUFFIX }}
