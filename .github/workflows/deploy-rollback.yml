@@ -4,21 +4,17 @@ on:
     inputs:
       NAIS_RESOURCE:
         type: string
-        required: true
         default: "nais.yml"
       NAIS_VARS:
         type: string
-        required: true
         default: "naiserator-dev.json"
       CLUSTER:
         type: string
         default: 'dev-gcp'
       VERSION:
-        required: true
         type: string
         default: "latest"
       TEAM:
-        required: true
         default: teampam
         type: string
 env:
