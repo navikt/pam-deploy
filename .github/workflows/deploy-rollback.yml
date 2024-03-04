@@ -16,7 +16,9 @@ on:
       VERSION:
         required: true
         type: string
+        default: "latest"
       TEAM:
+        required: true
         default: teampam
         type: string
 env:
