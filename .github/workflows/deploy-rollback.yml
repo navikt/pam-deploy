@@ -3,23 +3,23 @@ on:
   workflow_call:
     inputs:
       NAIS_RESOURCE:
-        required: true
+        required: false
         type: string
-        default: "nais.yml"
+        default: "naiserator.yml"
       NAIS_VARS:
-        required: true
+        required: false
         type: string
-        default: "naiserator-dev.json"
+        default: "naiserator-prod.json"
       CLUSTER:
-        required: true
+        required: false
         type: string
         default: 'dev-gcp'
       VERSION:
-        required: true
+        required: false
         type: string
         default: "latest"
       TEAM:
-        required: true
+        required: false
         default: teampam
         type: string
 
