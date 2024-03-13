@@ -68,7 +68,7 @@ jobs:
         if: ${{ inputs.LANGUAGE == 'java' && inputs.BUILD_CACHE == 'gradle'}}
         uses: gradle/actions/dependency-submission@v3
         with:
-          gradle-project-path: ${{ inputs.WORKING_DIRECTORY }}
+          build-root-directory: ${{ inputs.WORKING_DIRECTORY }}
       - name: Maven Dependency Submission
         if: ${{ inputs.LANGUAGE == 'java' && inputs.BUILD_CACHE == 'maven'}}
         uses: advanced-security/maven-dependency-submission-action@v4.0.0
