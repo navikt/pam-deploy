@@ -72,8 +72,6 @@ jobs:
       - name: Maven Dependency Submission
         if: ${{ inputs.LANGUAGE == 'java' && inputs.BUILD_CACHE == 'maven'}}
         uses: advanced-security/maven-dependency-submission-action@v4.0.0
-        with:
-          directory: ${{ inputs.WORKING_DIRECTORY }}
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
         with:
