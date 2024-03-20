@@ -132,6 +132,15 @@ jobs:
           build_secrets: |
             "optional_secret=${{ secrets.OPTIONAL_SECRET }}"
             "sentry_auth_token=${{ secrets.SENTRY_AUTH_TOKEN }}"
+      - name: Upload static files to CDN
+        if: ${{ inputs.CDN_SOURCE != '' }} && ${{ inputs.CDN_DESTINATION != '' }}
+        uses: nais/deploy/actions/cdn-upload/v2@master
+        with:
+          team: ${{ inputs.TEAM }}
+          source: ${{ inputs.CDN_SOURCE }}
+          destination: ${{ inputs.CDN_DESTINATION }}
+          project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
+          identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
       - name: Deploy to ${{ inputs.CLUSTER }}
         uses: nais/deploy/actions/deploy@v2
         env:
