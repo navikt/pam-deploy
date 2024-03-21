@@ -41,8 +41,6 @@ jobs:
         env:
           NPM_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm ci
-      - name: Build application
-        run: npm run build
       - name: Pre-deploy
         uses: navikt/pam-deploy/actions/pre-deploy@v7
         env:
@@ -50,6 +48,11 @@ jobs:
           PROJECT_ID: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
           TEAM: "teampam"
           DRAFTS_MAX: "10"
+      - name: Build application
+        run: npm run build
+        env:
+          SENTRY_RELEASE: @${{ env.VERSION_TAG }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
       - name: docker-build-push
         uses: nais/docker-build-push@v0
         id: docker-build-push
@@ -58,10 +61,6 @@ jobs:
           tag: ${{ env.VERSION_TAG }}
           identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
           project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
-          build_args: |
-            "VERSION_TAG=${{ env.VERSION_TAG }}"
-          build_secrets: |
-            "sentry_auth_token=${{ secrets.SENTRY_AUTH_TOKEN }}"
       - name: Deploy to ${{ inputs.CLUSTER }}
         uses: nais/deploy/actions/deploy@v2
         env:
