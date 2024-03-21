@@ -1,0 +1,90 @@
+on:
+  workflow_call:
+    inputs:
+      NODE_VERSION:
+        required: false
+        type: string
+        default: "20"
+      NAIS_VARS:
+        required: false
+        type: string
+        default: ".nais/dev.json"
+      SKIP_DRAFT_RELEASE:
+        required: false
+        type: boolean
+        default: false
+    outputs:
+      image:
+        description: "Image from nais build push action"
+        value: ${{ jobs.deploy-dev.outputs.image }}
+jobs:
+  deploy-dev:
+    permissions:
+      contents: write
+      id-token: write
+      security-events: write
+      actions: read
+    runs-on: ubuntu-latest
+    outputs:
+      image: ${{ steps.docker-build-push.outputs.image }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.NODE_VERSION }}
+          cache: 'npm'
+      - name: Install npm dependencies
+        env:
+          NPM_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm ci
+      - name: Build application
+        run: npm run build
+      - name: Pre-deploy
+        uses: navikt/pam-deploy/actions/pre-deploy@v7
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PROJECT_ID: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
+          TEAM: "teampam"
+          DRAFTS_MAX: "10"
+      - name: docker-build-push
+        uses: nais/docker-build-push@v0
+        id: docker-build-push
+        with:
+          team: "teampam"
+          tag: ${{ env.VERSION_TAG }}
+          identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
+          project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
+          build_args: |
+            "VERSION_TAG=${{ env.VERSION_TAG }}"
+          build_secrets: |
+            "sentry_auth_token=${{ secrets.SENTRY_AUTH_TOKEN }}"
+      - name: Deploy to ${{ inputs.CLUSTER }}
+        uses: nais/deploy/actions/deploy@v2
+        env:
+          CLUSTER: "dev-gcp"
+          RESOURCE: ".nais/nais.yml"
+          VARS: ${{ inputs.NAIS_VARS }}
+      - name: Post-deploy
+        uses: navikt/pam-deploy/actions/post-deploy@v7
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Draft release
+        if: ${{ !inputs.SKIP_DRAFT_RELEASE }}
+        uses: ncipollo/release-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag: ${{ env.VERSION_TAG }}
+          name: ${{ env.DRAFT_NAME }}
+          body: ${{ env.CHANGE_LOG }}
+          draft: true
+          prerelease: false
+
+  CodeQL:
+    uses: navikt/pam-deploy/.github/workflows/codeql.yml@v7
+    with:
+      LANGUAGE: "node"
+      BUILD_CACHE: "npm"
