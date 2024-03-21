@@ -70,6 +70,14 @@ jobs:
           tag: ${{ env.VERSION_TAG }}
           identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
           project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
+      - name: Upload static files to CDN
+        uses: nais/deploy/actions/cdn-upload/v2@master
+        with:
+          team: teampam
+          source: ./.next/static
+          destination: /${{github.event.repository.name}}/_next
+          project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
+          identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
       - name: Deploy to ${{ inputs.CLUSTER }}
         uses: nais/deploy/actions/deploy@v2
         env:
