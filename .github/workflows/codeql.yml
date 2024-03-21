@@ -20,7 +20,7 @@ on:
         required: true
         type: string
       WORKING_DIRECTORY:
-        required: true
+        required: false
         type: string
       IMAGE_SUFFIX:
         required: false
