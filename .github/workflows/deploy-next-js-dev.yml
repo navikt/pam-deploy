@@ -37,6 +37,15 @@ jobs:
         with:
           node-version: ${{ inputs.NODE_VERSION }}
           cache: 'npm'
+      - name: next.js cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            ${{ github.workspace }}/.next/cache
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
       - name: Install npm dependencies
         env:
           NPM_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -51,7 +60,7 @@ jobs:
       - name: Build application
         run: npm run build
         env:
-          SENTRY_RELEASE: @${{ env.VERSION_TAG }}
+          SENTRY_RELEASE: ${{ env.VERSION_TAG }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
       - name: docker-build-push
         uses: nais/docker-build-push@v0
