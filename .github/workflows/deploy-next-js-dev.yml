@@ -48,7 +48,7 @@ jobs:
             ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
       - name: Install npm dependencies
         env:
-          NPM_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_AUTH_TOKEN: ${{ secrets.READER_TOKEN }}
         run: npm ci
       - name: Pre-deploy
         uses: navikt/pam-deploy/actions/pre-deploy@v7
