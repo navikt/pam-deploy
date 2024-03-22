@@ -8,7 +8,7 @@ on:
       NAIS_VARS:
         required: false
         type: string
-        default: ".nais/dev.json"
+        default: ".nais/dev.yml"
       SKIP_DRAFT_RELEASE:
         required: false
         type: boolean
