@@ -1,6 +1,10 @@
 on:
   workflow_call:
     inputs:
+      TEAM:
+        required: false
+        type: string
+        default: "teampam"
       NODE_VERSION:
         required: false
         type: string
@@ -55,7 +59,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PROJECT_ID: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
-          TEAM: "teampam"
+          TEAM: ${{ inputs.TEAM }}
           DRAFTS_MAX: "10"
       - name: Run lint
         run: npm run lint
@@ -69,7 +73,7 @@ jobs:
       - name: Upload static files to CDN
         uses: nais/deploy/actions/cdn-upload/v2@master
         with:
-          team: teampam
+          team: ${{ inputs.TEAM }}
           source: ./.next/static
           destination: /${{github.event.repository.name}}/_next
           project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
@@ -78,7 +82,7 @@ jobs:
         uses: nais/docker-build-push@v0
         id: docker-build-push
         with:
-          team: "teampam"
+          team: ${{ inputs.TEAM }}
           tag: ${{ env.VERSION_TAG }}
           identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
           project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
