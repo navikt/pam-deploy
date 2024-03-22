@@ -57,19 +57,15 @@ jobs:
           PROJECT_ID: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
           TEAM: "teampam"
           DRAFTS_MAX: "10"
+      - name: Run lint
+        run: npm run lint
+      - name: Run prettier
+        run: npm run prettier
       - name: Build application
         run: npm run build
         env:
           SENTRY_RELEASE: ${{ env.VERSION_TAG }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-      - name: docker-build-push
-        uses: nais/docker-build-push@v0
-        id: docker-build-push
-        with:
-          team: "teampam"
-          tag: ${{ env.VERSION_TAG }}
-          identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
-          project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
       - name: Upload static files to CDN
         uses: nais/deploy/actions/cdn-upload/v2@master
         with:
@@ -78,6 +74,14 @@ jobs:
           destination: /${{github.event.repository.name}}/_next
           project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
           identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
+      - name: docker-build-push
+        uses: nais/docker-build-push@v0
+        id: docker-build-push
+        with:
+          team: "teampam"
+          tag: ${{ env.VERSION_TAG }}
+          identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
+          project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
       - name: Deploy to ${{ inputs.CLUSTER }}
         uses: nais/deploy/actions/deploy@v2
         env:
