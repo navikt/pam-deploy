@@ -65,6 +65,8 @@ jobs:
         run: npm run lint
       - name: Run prettier
         run: npm run prettier
+      - name: Run tests
+        run: npm run test
       - name: Build application
         run: npm run build
         env:
