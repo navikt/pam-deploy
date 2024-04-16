@@ -61,9 +61,8 @@ jobs:
           PROJECT_ID: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
           TEAM: ${{ inputs.TEAM }}
           DRAFTS_MAX: "10"
-      # Disable lint for now
-      #- name: Run lint
-      #  run: npm run lint
+      - name: Run lint
+        run: npm run lint
       - name: Run prettier
         run: npm run prettier
       - name: Run tests
