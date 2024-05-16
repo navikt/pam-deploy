@@ -163,7 +163,5 @@ jobs:
       NODE_VERSION: ${{ inputs.NODE_VERSION }}
       BUILD_CACHE: ${{ inputs.BUILD_CACHE }}
       BUILD_SCRIPT: ${{ inputs.BUILD_SCRIPT }}
-      WORKING_DIRECTORY: ${{ inputs.WORKING_DIRECTORY }}
-      IMAGE_SUFFIX: ${{ inputs.IMAGE_SUFFIX }}
     secrets:
       OPTIONAL_SECRET: ${{ secrets.OPTIONAL_SECRET }}
