@@ -54,9 +54,9 @@ jobs:
         env:
           NPM_AUTH_TOKEN: ${{ secrets.READER_TOKEN }}
         run: |
-          npm config set @navikt:registry https://npm.pkg.github.com \
-            npm config set //npm.pkg.github.com/:_authToken $NPM_AUTH_TOKEN \
-            npm ci
+          npm config set @navikt:registry https://npm.pkg.github.com
+          npm config set //npm.pkg.github.com/:_authToken $NPM_AUTH_TOKEN
+          npm ci
       - name: Pre-deploy
         uses: navikt/pam-deploy/actions/pre-deploy@v7
         env:
