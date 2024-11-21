@@ -109,6 +109,7 @@ jobs:
         working-directory: ${{ inputs.WORKING_DIRECTORY }}
         env:
           OPTIONAL_SECRET: ${{ secrets.OPTIONAL_SECRET }}
+          READER_TOKEN: ${{ secrets.READER_TOKEN }}
       - name: Pre-deploy
         uses: navikt/pam-deploy/actions/pre-deploy@v7
         env:
