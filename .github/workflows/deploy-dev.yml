@@ -168,4 +168,3 @@ jobs:
       BUILD_SCRIPT: ${{ inputs.BUILD_SCRIPT }}
     secrets:
       OPTIONAL_SECRET: ${{ secrets.OPTIONAL_SECRET }}
-      READER_TOKEN: ${{ secrets.READER_TOKEN }}
