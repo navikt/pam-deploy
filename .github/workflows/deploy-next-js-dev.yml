@@ -21,6 +21,10 @@ on:
         required: false
         type: boolean
         default: false
+      NPM_BUILD_COMMAND:
+        required: false
+        type: string
+        default: "npm run build"
     outputs:
       image:
         description: "Image from nais build push action"
@@ -75,7 +79,7 @@ jobs:
       - name: Run tests
         run: npm run test
       - name: Build application
-        run: npm run build
+        run: ${{ inputs.NPM_BUILD_COMMAND }}
         env:
           SENTRY_RELEASE: ${{ env.VERSION_TAG }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
