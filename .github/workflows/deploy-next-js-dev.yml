@@ -9,6 +9,10 @@ on:
         required: false
         type: string
         default: "20"
+      NAIS_RESOURCE:
+        required: false
+        type: string
+        default: ".nais/nais.yml"
       NAIS_VARS:
         required: false
         type: string
@@ -95,7 +99,7 @@ jobs:
         uses: nais/deploy/actions/deploy@v2
         env:
           CLUSTER: "dev-gcp"
-          RESOURCE: ".nais/nais.yml"
+          RESOURCE: ${{ inputs.NAIS_RESOURCE }}
           VARS: ${{ inputs.NAIS_VARS }}
       - name: Post-deploy
         uses: navikt/pam-deploy/actions/post-deploy@v7
