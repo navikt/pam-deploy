@@ -28,6 +28,10 @@ on:
       IMAGE_SUFFIX:
         required: false
         type: string
+      CODEQL_ENABLED:
+        required: false
+        type: boolean
+        default: true
     outputs:
       image:
         description: "Image from nais build push action"
@@ -127,6 +131,7 @@ jobs:
           prerelease: false
 
   CodeQL:
+    if: ${{ inputs.CODEQL_ENABLED }}
     uses: navikt/pam-deploy/.github/workflows/codeql.yml@v7
     with:
       LANGUAGE: "node"
