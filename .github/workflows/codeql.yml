@@ -22,6 +22,8 @@ on:
     secrets:
       OPTIONAL_SECRET:
         required: false
+      READER_TOKEN:
+        required: false
 jobs:
   analyze:
     name: CodeQL Analyze
