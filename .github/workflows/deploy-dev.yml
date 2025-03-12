@@ -60,6 +60,9 @@ on:
         required: false
         type: string
         default: "10"
+      VERSION_TAG:
+        required: false
+        type: string
     secrets:
       SNYK_TOKEN:
         required: false
@@ -118,6 +121,7 @@ jobs:
           TEAM: ${{ inputs.TEAM }}
           IMAGE_SUFFIX: ${{ inputs.IMAGE_SUFFIX }}
           DRAFTS_MAX: ${{ inputs.DRAFTS_MAX }}
+          VERSION_TAG: ${{ inputs.VERSION_TAG }}
       - name: docker-build-push
         uses: nais/docker-build-push@v0
         id: docker-build-push
