@@ -2,7 +2,7 @@
 set -e
 
 GITHUB_URL="https://api.github.com/repos/$GITHUB_REPOSITORY"
-DOCKER_REPO="europe-north1-docker.pkg.dev/$PROJECT_ID/$TEAM"
+DOCKER_REPO="europe-north1-docker.pkg.dev/nais-management-233d/$TEAM"
 # Checking if too many drafts before starting the deploy
 DRAFTS=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "$GITHUB_URL/releases?per_page=20" | jq -r '. | map(select(.draft == true)) | length')
 if [[ "$DRAFTS" -gt "$DRAFTS_MAX" ]]; then

@@ -35,7 +35,6 @@ jobs:
       - name: pre-production
         uses: navikt/pam-deploy/actions/pre-production@v7
         env:
-          PROJECT_ID: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
           TEAM: ${{ inputs.TEAM }}
           IMAGE_SUFFIX: ${{ inputs.IMAGE_SUFFIX }}
       - uses: nais/deploy/actions/deploy@v2
