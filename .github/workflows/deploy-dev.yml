@@ -71,7 +71,7 @@ on:
       SENTRY_AUTH_TOKEN:
         required: false
       NAIS_WORKLOAD_IDENTITY_PROVIDER: # DENNE VARIABELEN EKSISTER IKKE LENGER. KAN FJERNES I NY VERSJON AV PAM-DEPLOY
-        required: true
+        required: false
     outputs:
       image:
         description: "Image from nais build push action"
