@@ -34,7 +34,7 @@ jobs:
       - name: Set environment variables
         run: |
           echo "VERSION_TAG=${{ inputs.VERSION }}" >> $GITHUB_ENV
-          echo "IMAGE=europe-north1-docker.pkg.dev/${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}/${{ inputs.TEAM }}/${{ github.event.repository.name }}:${{ inputs.VERSION }}" >> $GITHUB_ENV
+          echo "IMAGE=europe-north1-docker.pkg.dev/nais-management-233d/${{ inputs.TEAM }}/${{ github.event.repository.name }}:${{ inputs.VERSION }}" >> $GITHUB_ENV
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0

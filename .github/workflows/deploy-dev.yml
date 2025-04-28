@@ -70,8 +70,8 @@ on:
         required: false
       SENTRY_AUTH_TOKEN:
         required: false
-      NAIS_WORKLOAD_IDENTITY_PROVIDER:
-        required: true
+      NAIS_WORKLOAD_IDENTITY_PROVIDER: # DENNE VARIABELEN EKSISTER IKKE LENGER. KAN FJERNES I NY VERSJON AV PAM-DEPLOY
+        required: false
     outputs:
       image:
         description: "Image from nais build push action"
@@ -117,7 +117,6 @@ jobs:
         uses: navikt/pam-deploy/actions/pre-deploy@v7
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PROJECT_ID: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
           TEAM: ${{ inputs.TEAM }}
           IMAGE_SUFFIX: ${{ inputs.IMAGE_SUFFIX }}
           DRAFTS_MAX: ${{ inputs.DRAFTS_MAX }}
@@ -128,8 +127,6 @@ jobs:
         with:
           team: ${{ inputs.TEAM }}
           tag: ${{ env.VERSION_TAG }}
-          identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
-          project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
           dockerfile: "${{ inputs.WORKING_DIRECTORY }}Dockerfile"
           image_suffix: ${{ inputs.IMAGE_SUFFIX }}
           build_args: |

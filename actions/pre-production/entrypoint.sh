@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-DOCKER_REPO="europe-north1-docker.pkg.dev/$PROJECT_ID/$TEAM"
+DOCKER_REPO="europe-north1-docker.pkg.dev/nais-management-233d/$TEAM"
 
 if [ -z "$APPLICATION" ]; then
   APPLICATION=$(echo $GITHUB_REPOSITORY | cut -d "/" -f 2)
