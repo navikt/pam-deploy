@@ -166,4 +166,4 @@ jobs:
     uses: navikt/pam-deploy/.github/workflows/codeql.yml@v7
     with:
       LANGUAGE: "node"
-      BUILD_CACHE: "npm"
+      BUILD_CACHE: ${{ inputs.PACKAGE_MANAGER }}
