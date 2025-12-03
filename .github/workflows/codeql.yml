@@ -48,6 +48,11 @@ jobs:
           distribution: ${{ inputs.JAVA_DISTRIBUTION }}
           java-version: ${{ inputs.JAVA_VERSION }}
           cache: ${{ inputs.BUILD_CACHE }}
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        if: ${{ inputs.BUILD_CACHE == 'pnpm' }}
+        with:
+          run_install: false
       - name: Setup Node
         if: ${{ inputs.LANGUAGE == 'node' }}
         uses: actions/setup-node@v4
