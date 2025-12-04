@@ -9,6 +9,10 @@ on:
         required: false
         type: string
         default: "20"
+      PACKAGE_MANAGER:
+        required: false
+        type: string
+        default: "pnpm"
       NAIS_RESOURCE:
         required: false
         type: string
@@ -21,10 +25,14 @@ on:
         required: false
         type: boolean
         default: false
-      NPM_BUILD_COMMAND:
+      BUILD_COMMAND:
         required: false
         type: string
-        default: "npm run build"
+        default: "pnpm build"
+      INSTALL_DEPENDENCIES_COMMAND:
+        required: false
+        type: string
+        default: "pnpm install --frozen-lockfile"
       IMAGE_SUFFIX:
         required: false
         type: string
@@ -54,12 +62,18 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        if: ${{ inputs.PACKAGE_MANAGER == 'pnpm' }}
+        with:
+          run_install: false
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: ${{ inputs.NODE_VERSION }}
-          cache: 'npm'
-      - name: next.js cache
+          cache: ${{ inputs.PACKAGE_MANAGER }}
+      - name: Next.js npm cache
+        if: ${{ inputs.PACKAGE_MANAGER == 'npm' }}
         uses: actions/cache@v4
         with:
           path: |
@@ -69,12 +83,30 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
       - name: Install npm dependencies
+        if: ${{ inputs.PACKAGE_MANAGER == 'npm' }}
         env:
           NPM_AUTH_TOKEN: ${{ secrets.READER_TOKEN }}
         run: |
           npm config set @navikt:registry https://npm.pkg.github.com
           npm config set //npm.pkg.github.com/:_authToken $NPM_AUTH_TOKEN
           npm ci
+      - name: Next.js pnpm cache
+        if: ${{ inputs.PACKAGE_MANAGER == 'pnpm' }}
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ github.workspace }}/.next/cache
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('pnpm-lock.yaml') }}-${{ hashFiles('**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-${{ hashFiles('pnpm-lock.yaml') }}-
+      - name: Install pnpm dependencies
+        if: ${{ inputs.PACKAGE_MANAGER == 'pnpm' }}
+        env:
+          NPM_AUTH_TOKEN: ${{ secrets.READER_TOKEN }}
+        run: |
+          ${{ inputs.PACKAGE_MANAGER }} config set @navikt:registry https://npm.pkg.github.com
+          ${{ inputs.PACKAGE_MANAGER }} config set //npm.pkg.github.com/:_authToken $NPM_AUTH_TOKEN
+          ${{ inputs.INSTALL_DEPENDENCIES_COMMAND }}
       - name: Pre-deploy
         uses: navikt/pam-deploy/actions/pre-deploy@v7
         env:
@@ -84,13 +116,13 @@ jobs:
           DRAFTS_MAX: "10"
           VERSION_TAG: ${{ inputs.VERSION_TAG }}
       - name: Run lint
-        run: npm run lint
+        run: ${{ inputs.PACKAGE_MANAGER }} run lint
       - name: Run prettier
-        run: npm run prettier
+        run: ${{ inputs.PACKAGE_MANAGER }} run prettier
       - name: Run tests
-        run: npm run test
+        run: ${{ inputs.PACKAGE_MANAGER }} run test
       - name: Build application
-        run: ${{ inputs.NPM_BUILD_COMMAND }}
+        run: ${{ inputs.BUILD_COMMAND }}
         env:
           SENTRY_RELEASE: ${{ env.VERSION_TAG }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
@@ -131,7 +163,7 @@ jobs:
 
   CodeQL:
     if: ${{ inputs.CODEQL_ENABLED }}
-    uses: navikt/pam-deploy/.github/workflows/codeql.yml@v7
+    uses: navikt/pam-deploy/.github/workflows/codeql.yml@v8
     with:
       LANGUAGE: "node"
-      BUILD_CACHE: "npm"
+      BUILD_CACHE: ${{ inputs.PACKAGE_MANAGER }}
