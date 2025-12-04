@@ -163,7 +163,7 @@ jobs:
 
   CodeQL:
     if: ${{ inputs.CODEQL_ENABLED }}
-    uses: navikt/pam-deploy/.github/workflows/codeql.yml@v7
+    uses: navikt/pam-deploy/.github/workflows/codeql.yml@v8
     with:
       LANGUAGE: "node"
       BUILD_CACHE: ${{ inputs.PACKAGE_MANAGER }}
