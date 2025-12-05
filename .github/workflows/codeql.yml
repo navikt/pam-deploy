@@ -59,6 +59,11 @@ jobs:
         with:
           node-version: ${{ inputs.NODE_VERSION }}
           cache: ${{ inputs.BUILD_CACHE }}
+        # To avoid setup-node cache failure.
+        # ref. https://github.com/actions/setup-node/issues/1137
+      - name: Create pnpm cache directory
+        if: ${{ inputs.BUILD_CACHE == 'pnpm' }}
+        run: mkdir -vp $(pnpm store path --silent)
       - name: Build and test
         run: |
           ${{ inputs.BUILD_SCRIPT }}
