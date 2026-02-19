@@ -47,6 +47,9 @@ on:
       image:
         description: "Image from nais build push action"
         value: ${{ jobs.deploy-dev.outputs.image }}
+    secrets:
+      NEXT_SERVER_ACTIONS_ENCRYPTION_KEY:
+        required: false
 jobs:
   deploy-dev:
     permissions:
