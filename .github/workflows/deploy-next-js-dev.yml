@@ -1,6 +1,9 @@
 on:
   workflow_call:
     inputs:
+      next_server_actions_encryption_key:
+        required: false
+        type: string
       TEAM:
         required: false
         type: string
@@ -43,13 +46,12 @@ on:
       VERSION_TAG:
         required: false
         type: string
+      GITHUB_SECRETS:
+        type: string
     outputs:
       image:
         description: "Image from nais build push action"
         value: ${{ jobs.deploy-dev.outputs.image }}
-    secrets:
-      NEXT_SERVER_ACTIONS_ENCRYPTION_KEY:
-        required: false
 jobs:
   deploy-dev:
     permissions:
@@ -129,7 +131,7 @@ jobs:
         env:
           SENTRY_RELEASE: ${{ env.VERSION_TAG }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: ${{ secrets.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY }}
+          NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: ${{ inputs.next_server_actions_encryption_key || '' }}
       - name: Upload static files to CDN
         uses: nais/deploy/actions/cdn-upload/v2@master
         with:
