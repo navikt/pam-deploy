@@ -46,8 +46,6 @@ on:
       VERSION_TAG:
         required: false
         type: string
-      GITHUB_SECRETS:
-        type: string
     outputs:
       image:
         description: "Image from nais build push action"
