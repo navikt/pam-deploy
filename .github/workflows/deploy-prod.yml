@@ -20,8 +20,12 @@ on:
       IMAGE_SUFFIX:
         required: false
         type: string
+      VERSION_TAG:
+        required: false
+        type: string
+
 env:
-  VERSION_TAG: ${{ github.event.release.tag_name }}
+  VERSION_TAG: ${{ inputs.VERSION_TAG || github.event.release.tag_name }}
 
 jobs:
   deploy-prod:
