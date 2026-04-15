@@ -161,7 +161,7 @@ jobs:
           prerelease: false
   CodeQL:
     if: ${{ inputs.CODEQL_ENABLED }}
-    uses: navikt/pam-deploy/.github/workflows/codeql.yml@v7
+    uses: navikt/pam-deploy/.github/workflows/codeql.yml@v9
     with:
       LANGUAGE: ${{ inputs.LANGUAGE }}
       JAVA_DISTRIBUTION: ${{ inputs.JAVA_DISTRIBUTION }}
