@@ -168,3 +168,4 @@ jobs:
     with:
       LANGUAGE: "node"
       BUILD_CACHE: ${{ inputs.PACKAGE_MANAGER }}
+      NODE_VERSION: ${{ inputs.NODE_VERSION }}
