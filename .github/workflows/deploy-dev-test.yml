@@ -32,7 +32,7 @@ jobs:
           persist-credentials: false
 
       - name: Process nais doc
-        uses: navikt/pam-deploy/actions/documentation@v9
+        uses: ./actions/documentation
         env:
           CLUSTER: ${{ inputs.CLUSTER }}
           RESOURCE: ${{ inputs.NAIS_RESOURCE }}
