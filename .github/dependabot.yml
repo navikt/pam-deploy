@@ -7,6 +7,8 @@ updates:
       day: monday
       time: "06:00"
       timezone: Europe/Oslo
+    cooldown:
+      default-days: 7
     labels:
       - dependencies
     # Group all action updates into a single PR to reduce noise
