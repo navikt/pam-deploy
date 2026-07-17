@@ -28,19 +28,21 @@ jobs:
   analyze:
     name: CodeQL Analyze
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     permissions:
       contents: write
       security-events: write
       actions: read
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
           fetch-depth: 0
+          persist-credentials: false
       - name: Setup CodeQL
-        uses: github/codeql-action/init@v4
+        uses: github/codeql-action/init@7188fc363630916deb702c7fdcf4e481b751f97a # v4
         with:
-          external-repository-token: ${{ secrets.GITHUB_TOKEN }}
           languages: ${{ (inputs.LANGUAGE == 'node' && 'javascript') || inputs.LANGUAGE }}
+          queries: security-and-quality
       - name: Setup java
         if: ${{ inputs.LANGUAGE == 'java' }}
         uses: actions/setup-java@v5
@@ -66,8 +68,9 @@ jobs:
         run: mkdir -vp $(pnpm store path --silent)
       - name: Build and test
         run: |
-          ${{ inputs.BUILD_SCRIPT }}
+          bash -eo pipefail -c "$BUILD_SCRIPT"
         env:
+          BUILD_SCRIPT: ${{ inputs.BUILD_SCRIPT }}
           OPTIONAL_SECRET: ${{ secrets.OPTIONAL_SECRET }}
           READER_TOKEN: ${{ secrets.READER_TOKEN }}
       - name: Gradle Dependency Submission
@@ -77,6 +80,6 @@ jobs:
         if: ${{ inputs.LANGUAGE == 'java' && inputs.BUILD_CACHE == 'maven'}}
         uses: advanced-security/maven-dependency-submission-action@v5.0.0
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v4
+        uses: github/codeql-action/analyze@7188fc363630916deb702c7fdcf4e481b751f97a # v4
         with:
           category: "/language:${{ (inputs.LANGUAGE == 'node' && 'javascript') || inputs.LANGUAGE }}"

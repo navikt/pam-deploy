@@ -30,18 +30,24 @@ env:
 jobs:
   deploy-prod:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     environment: ${{ inputs.CLUSTER }}
+    permissions:
+      contents: write
+      id-token: write
+      actions: read
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
           fetch-depth: 0
           ref: ${{ env.VERSION_TAG }}
+          persist-credentials: false
       - name: pre-production
         uses: navikt/pam-deploy/actions/pre-production@v9
         env:
           TEAM: ${{ inputs.TEAM }}
           IMAGE_SUFFIX: ${{ inputs.IMAGE_SUFFIX }}
-      - uses: nais/deploy/actions/deploy@v2
+      - uses: nais/deploy/actions/deploy@2d18f050f07b6a007864c6a57070ed915d571beb # v2
         name: deploy to ${{ inputs.CLUSTER }}
         env:
           CLUSTER: ${{ inputs.CLUSTER }}

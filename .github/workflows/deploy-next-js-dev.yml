@@ -56,12 +56,14 @@ jobs:
       security-events: write
       actions: read
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     outputs:
       image: ${{ steps.docker-build-push.outputs.image }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
           fetch-depth: 0
+          persist-credentials: false
       - name: Install pnpm
         uses: pnpm/action-setup@v6
         if: ${{ inputs.PACKAGE_MANAGER == 'pnpm' }}
@@ -103,10 +105,12 @@ jobs:
         if: ${{ inputs.PACKAGE_MANAGER == 'pnpm' }}
         env:
           NPM_AUTH_TOKEN: ${{ secrets.READER_TOKEN }}
+          PACKAGE_MANAGER: ${{ inputs.PACKAGE_MANAGER }}
+          INSTALL_DEPENDENCIES_COMMAND: ${{ inputs.INSTALL_DEPENDENCIES_COMMAND }}
         run: |
-          ${{ inputs.PACKAGE_MANAGER }} config set @navikt:registry https://npm.pkg.github.com
-          ${{ inputs.PACKAGE_MANAGER }} config set //npm.pkg.github.com/:_authToken $NPM_AUTH_TOKEN
-          ${{ inputs.INSTALL_DEPENDENCIES_COMMAND }}
+          "$PACKAGE_MANAGER" config set @navikt:registry https://npm.pkg.github.com
+          "$PACKAGE_MANAGER" config set //npm.pkg.github.com/:_authToken "$NPM_AUTH_TOKEN"
+          bash -eo pipefail -c "$INSTALL_DEPENDENCIES_COMMAND"
       - name: Pre-deploy
         uses: navikt/pam-deploy/actions/pre-deploy@v9
         env:
@@ -116,32 +120,55 @@ jobs:
           DRAFTS_MAX: "10"
           VERSION_TAG: ${{ inputs.VERSION_TAG }}
       - name: Run lint
-        run: ${{ inputs.PACKAGE_MANAGER }} run lint
-      - name: Run prettier
-        run: ${{ inputs.PACKAGE_MANAGER }} run prettier
-      - name: Run tests
-        run: ${{ inputs.PACKAGE_MANAGER }} run test
-      - name: Build application
-        run: ${{ inputs.BUILD_COMMAND }}
         env:
+          PACKAGE_MANAGER: ${{ inputs.PACKAGE_MANAGER }}
+        run: |
+          "$PACKAGE_MANAGER" run lint
+      - name: Run prettier
+        env:
+          PACKAGE_MANAGER: ${{ inputs.PACKAGE_MANAGER }}
+        run: |
+          "$PACKAGE_MANAGER" run prettier
+      - name: Run tests
+        env:
+          PACKAGE_MANAGER: ${{ inputs.PACKAGE_MANAGER }}
+        run: |
+          "$PACKAGE_MANAGER" run test
+      - name: Build application
+        run: bash -eo pipefail -c "$BUILD_COMMAND"
+        env:
+          BUILD_COMMAND: ${{ inputs.BUILD_COMMAND }}
           SENTRY_RELEASE: ${{ env.VERSION_TAG }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: ${{ secrets.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY || '' }}
       - name: Upload static files to CDN
-        uses: nais/deploy/actions/cdn-upload/v2@master
+        uses: nais/deploy/actions/cdn-upload/v2@2d18f050f07b6a007864c6a57070ed915d571beb # v2
         with:
           team: ${{ inputs.TEAM }}
           source: ./.next/static
           destination: /${{github.event.repository.name}}/_next
       - name: docker-build-push
-        uses: nais/docker-build-push@v0
+        uses: nais/docker-build-push@31c3a7321909bcb20799fdf46153fec721fd9512 # v0
         id: docker-build-push
         with:
           team: ${{ inputs.TEAM }}
           tag: ${{ env.VERSION_TAG }}
           image_suffix: ${{ inputs.IMAGE_SUFFIX }}
+      - name: Trivy image scan
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          image-ref: ${{ steps.docker-build-push.outputs.image }}
+          format: "sarif"
+          output: "trivy.sarif"
+          ignore-unfixed: true
+          exit-code: "0"
+      - name: Upload Trivy results to GitHub Security
+        uses: github/codeql-action/upload-sarif@7188fc363630916deb702c7fdcf4e481b751f97a # v4
+        with:
+          sarif_file: "trivy.sarif"
+          category: "trivy-image"
       - name: Deploy to dev-gcp
-        uses: nais/deploy/actions/deploy@v2
+        uses: nais/deploy/actions/deploy@2d18f050f07b6a007864c6a57070ed915d571beb # v2
         env:
           CLUSTER: "dev-gcp"
           RESOURCE: ${{ inputs.NAIS_RESOURCE }}
@@ -152,18 +179,29 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Draft release
         if: ${{ !inputs.SKIP_DRAFT_RELEASE }}
-        uses: ncipollo/release-action@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag: ${{ env.VERSION_TAG }}
-          name: ${{ env.DRAFT_NAME }}
-          body: ${{ env.CHANGE_LOG }}
-          draft: true
-          prerelease: false
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION_TAG: ${{ env.VERSION_TAG }}
+          DRAFT_NAME: ${{ env.DRAFT_NAME }}
+        run: |
+          notes_file="$(mktemp)"
+          gh api "repos/$GITHUB_REPOSITORY/releases/generate-notes" \
+            -f tag_name="$VERSION_TAG" \
+            -f target_commitish="$GITHUB_SHA" \
+            --jq '.body' > "$notes_file"
+          if gh release view "$VERSION_TAG" >/dev/null 2>&1; then
+            gh release edit "$VERSION_TAG" --title "$DRAFT_NAME" --notes-file "$notes_file" --draft
+          else
+            gh release create "$VERSION_TAG" --title "$DRAFT_NAME" --notes-file "$notes_file" --draft
+          fi
+          rm -f "$notes_file"
 
   CodeQL:
     if: ${{ inputs.CODEQL_ENABLED }}
+    permissions:
+      contents: write
+      security-events: write
+      actions: read
     uses: navikt/pam-deploy/.github/workflows/codeql.yml@v9
     with:
       LANGUAGE: "node"
