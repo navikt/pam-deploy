@@ -112,7 +112,7 @@ jobs:
           "$PACKAGE_MANAGER" config set //npm.pkg.github.com/:_authToken "$NPM_AUTH_TOKEN"
           bash -eo pipefail -c "$INSTALL_DEPENDENCIES_COMMAND"
       - name: Pre-deploy
-        uses: ./actions/pre-deploy
+        uses: navikt/pam-deploy/actions/pre-deploy@v9
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TEAM: ${{ inputs.TEAM }}
@@ -174,7 +174,7 @@ jobs:
           RESOURCE: ${{ inputs.NAIS_RESOURCE }}
           VARS: ${{ inputs.NAIS_VARS }}
       - name: Post-deploy
-        uses: ./actions/post-deploy
+        uses: navikt/pam-deploy/actions/post-deploy@v9
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Draft release
@@ -202,7 +202,7 @@ jobs:
       contents: write
       security-events: write
       actions: read
-    uses: ./.github/workflows/codeql.yml
+    uses: navikt/pam-deploy/.github/workflows/codeql.yml@v9
     with:
       LANGUAGE: "node"
       BUILD_CACHE: ${{ inputs.PACKAGE_MANAGER }}
