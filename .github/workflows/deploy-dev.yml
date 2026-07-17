@@ -70,7 +70,9 @@ on:
         required: false
       SENTRY_AUTH_TOKEN:
         required: false
-      NAIS_WORKLOAD_IDENTITY_PROVIDER: # DENNE VARIABELEN EKSISTER IKKE LENGER. KAN FJERNES I NY VERSJON AV PAM-DEPLOY
+      READER_TOKEN:
+        required: false
+      NAIS_WORKLOAD_IDENTITY_PROVIDER: # DEPRECATED: ubrukt, beholdt for bakoverkompatibilitet. Fjern kall til denne i konsument-repoene, så kan den fjernes helt.
         required: false
     outputs:
       image:
@@ -84,13 +86,15 @@ jobs:
       security-events: write
       actions: read
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     environment: ${{ inputs.CLUSTER }}
     outputs:
       image: ${{ steps.docker-build-push.outputs.image }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
           fetch-depth: 0
+          persist-credentials: false
       - uses: docker/setup-buildx-action@v4
         name: Set up Docker Buildx
       - name: Setup java
@@ -113,9 +117,10 @@ jobs:
           cache: ${{ inputs.BUILD_CACHE }}
       - name: Build and test
         run: |
-          ${{ inputs.BUILD_SCRIPT }}
+          bash -eo pipefail -c "$BUILD_SCRIPT"
         working-directory: ${{ inputs.WORKING_DIRECTORY }}
         env:
+          BUILD_SCRIPT: ${{ inputs.BUILD_SCRIPT }}
           OPTIONAL_SECRET: ${{ secrets.OPTIONAL_SECRET }}
           READER_TOKEN: ${{ secrets.READER_TOKEN }}
       - name: Pre-deploy
@@ -127,7 +132,7 @@ jobs:
           DRAFTS_MAX: ${{ inputs.DRAFTS_MAX }}
           VERSION_TAG: ${{ inputs.VERSION_TAG }}
       - name: docker-build-push
-        uses: nais/docker-build-push@v0
+        uses: nais/docker-build-push@31c3a7321909bcb20799fdf46153fec721fd9512 # v0
         id: docker-build-push
         with:
           team: ${{ inputs.TEAM }}
@@ -143,8 +148,21 @@ jobs:
             "npm_auth_token=${{ secrets.READER_TOKEN }}"
         env:
           ACTIONS_RUNTIME_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Trivy image scan
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          image-ref: ${{ steps.docker-build-push.outputs.image }}
+          format: "sarif"
+          output: "trivy.sarif"
+          ignore-unfixed: true
+          exit-code: "0"
+      - name: Upload Trivy results to GitHub Security
+        uses: github/codeql-action/upload-sarif@7188fc363630916deb702c7fdcf4e481b751f97a # v4
+        with:
+          sarif_file: "trivy.sarif"
+          category: "trivy-image"
       - name: Deploy to ${{ inputs.CLUSTER }}
-        uses: nais/deploy/actions/deploy@v2
+        uses: nais/deploy/actions/deploy@2d18f050f07b6a007864c6a57070ed915d571beb # v2
         env:
           CLUSTER: ${{ inputs.CLUSTER }}
           RESOURCE: ${{ inputs.NAIS_RESOURCE }}
@@ -155,17 +173,28 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Draft release
         if: ${{ !inputs.SKIP_DRAFT_RELEASE && github.ref == format('refs/heads/{0}', github.event.repository.default_branch) }}
-        uses: ncipollo/release-action@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag: ${{ env.VERSION_TAG }}
-          name: ${{ env.DRAFT_NAME }}
-          body: ${{ env.CHANGE_LOG }}
-          draft: true
-          prerelease: false
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION_TAG: ${{ env.VERSION_TAG }}
+          DRAFT_NAME: ${{ env.DRAFT_NAME }}
+        run: |
+          notes_file="$(mktemp)"
+          gh api "repos/$GITHUB_REPOSITORY/releases/generate-notes" \
+            -f tag_name="$VERSION_TAG" \
+            -f target_commitish="$GITHUB_SHA" \
+            --jq '.body' > "$notes_file"
+          if gh release view "$VERSION_TAG" >/dev/null 2>&1; then
+            gh release edit "$VERSION_TAG" --title "$DRAFT_NAME" --notes-file "$notes_file" --draft
+          else
+            gh release create "$VERSION_TAG" --title "$DRAFT_NAME" --notes-file "$notes_file" --draft
+          fi
+          rm -f "$notes_file"
   CodeQL:
     if: ${{ inputs.CODEQL_ENABLED }}
+    permissions:
+      contents: write
+      security-events: write
+      actions: read
     uses: navikt/pam-deploy/.github/workflows/codeql.yml@v9
     with:
       LANGUAGE: ${{ inputs.LANGUAGE }}

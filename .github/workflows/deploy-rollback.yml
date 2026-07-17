@@ -30,16 +30,22 @@ jobs:
       id-token: write
       actions: read
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - name: Set environment variables
+        env:
+          INPUT_VERSION: ${{ inputs.VERSION }}
+          INPUT_TEAM: ${{ inputs.TEAM }}
+          REPO_NAME: ${{ github.event.repository.name }}
         run: |
-          echo "VERSION_TAG=${{ inputs.VERSION }}" >> $GITHUB_ENV
-          echo "IMAGE=europe-north1-docker.pkg.dev/nais-management-233d/${{ inputs.TEAM }}/${{ github.event.repository.name }}:${{ inputs.VERSION }}" >> $GITHUB_ENV
-      - uses: actions/checkout@v7
+          echo "VERSION_TAG=$INPUT_VERSION" >> "$GITHUB_ENV"
+          echo "IMAGE=europe-north1-docker.pkg.dev/nais-management-233d/$INPUT_TEAM/$REPO_NAME:$INPUT_VERSION" >> "$GITHUB_ENV"
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
           fetch-depth: 0
           ref: ${{ env.VERSION_TAG }}
-      - uses: nais/deploy/actions/deploy@v2
+          persist-credentials: false
+      - uses: nais/deploy/actions/deploy@2d18f050f07b6a007864c6a57070ed915d571beb # v2
         name: deploy to ${{ inputs.CLUSTER }}
         env:
           CLUSTER: ${{ inputs.CLUSTER }}
