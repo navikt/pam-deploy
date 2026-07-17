@@ -26,12 +26,12 @@ jobs:
       contents: write
       id-token: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
       - name: Process nais doc
-        uses: navikt/pam-deploy/actions/documentation@v2
+        uses: navikt/pam-deploy/actions/documentation@v9
         env:
           CLUSTER: ${{ inputs.CLUSTER }}
           RESOURCE: ${{ inputs.NAIS_RESOURCE }}
