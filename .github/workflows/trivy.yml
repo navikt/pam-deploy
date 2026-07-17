@@ -1,0 +1,62 @@
+name: trivy-scan
+# Reusable image vulnerability scan for consumer repos.
+# Recommended usage: call on a schedule so new CVEs are caught even without
+# code changes. See https://sikkerhet.nav.no/docs/verktoy/trivy
+#
+# Example (in a consumer repo, .github/workflows/trivy.yml):
+#   on:
+#     schedule:
+#       - cron: "0 6 * * 1"
+#     workflow_dispatch:
+#   jobs:
+#     scan:
+#       uses: navikt/pam-deploy/.github/workflows/trivy.yml@v9
+#       permissions:
+#         contents: read
+#         id-token: write
+#         actions: read
+#         security-events: write
+#       with:
+#         IMAGE: europe-north1-docker.pkg.dev/nais-management-233d/teampam/<app>:latest
+on:
+  workflow_call:
+    inputs:
+      IMAGE:
+        description: "Full image reference to scan (registry/path:tag)"
+        required: true
+        type: string
+      TEAM:
+        required: false
+        type: string
+        default: "teampam"
+
+jobs:
+  trivy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      id-token: write # for nais/login
+      actions: read # for private repositories
+      security-events: write # push sarif to github security
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
+      - name: Login to GAR
+        uses: nais/login@bb6c3e1e14e53d40d69d0d092bd2fce2e39ae3bf # v0
+        with:
+          team: ${{ inputs.TEAM }}
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          image-ref: ${{ inputs.IMAGE }}
+          format: "sarif"
+          output: "trivy.sarif"
+          ignore-unfixed: true
+          exit-code: "0"
+      - name: Upload results to GitHub Security
+        uses: github/codeql-action/upload-sarif@7188fc363630916deb702c7fdcf4e481b751f97a # v4
+        with:
+          sarif_file: "trivy.sarif"
+          category: "trivy-scheduled"
