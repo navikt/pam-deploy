@@ -43,7 +43,7 @@ jobs:
           ref: ${{ env.VERSION_TAG }}
           persist-credentials: false
       - name: pre-production
-        uses: navikt/pam-deploy/actions/pre-production@v9
+        uses: ./actions/pre-production
         env:
           TEAM: ${{ inputs.TEAM }}
           IMAGE_SUFFIX: ${{ inputs.IMAGE_SUFFIX }}
@@ -54,7 +54,7 @@ jobs:
           RESOURCE: ${{ inputs.NAIS_RESOURCE }}
           VARS: ${{ inputs.NAIS_VARS }}
       - name: post-production
-        uses: navikt/pam-deploy/actions/post-production@v9
+        uses: ./actions/post-production
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           IMAGE_SUFFIX: ${{ inputs.IMAGE_SUFFIX }}

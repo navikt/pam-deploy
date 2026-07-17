@@ -65,18 +65,18 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
       - name: Install pnpm
-        uses: pnpm/action-setup@v6
+        uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6
         if: ${{ inputs.PACKAGE_MANAGER == 'pnpm' }}
         with:
           run_install: false
       - name: Setup Node
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
           node-version: ${{ inputs.NODE_VERSION }}
           cache: ${{ inputs.PACKAGE_MANAGER }}
       - name: Next.js npm cache
         if: ${{ inputs.PACKAGE_MANAGER == 'npm' }}
-        uses: actions/cache@v6
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
         with:
           path: |
             ~/.npm
@@ -94,7 +94,7 @@ jobs:
           npm ci
       - name: Next.js pnpm cache
         if: ${{ inputs.PACKAGE_MANAGER == 'pnpm' }}
-        uses: actions/cache@v6
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
         with:
           path: |
             ${{ github.workspace }}/.next/cache
@@ -112,7 +112,7 @@ jobs:
           "$PACKAGE_MANAGER" config set //npm.pkg.github.com/:_authToken "$NPM_AUTH_TOKEN"
           bash -eo pipefail -c "$INSTALL_DEPENDENCIES_COMMAND"
       - name: Pre-deploy
-        uses: navikt/pam-deploy/actions/pre-deploy@v9
+        uses: ./actions/pre-deploy
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TEAM: ${{ inputs.TEAM }}
@@ -174,7 +174,7 @@ jobs:
           RESOURCE: ${{ inputs.NAIS_RESOURCE }}
           VARS: ${{ inputs.NAIS_VARS }}
       - name: Post-deploy
-        uses: navikt/pam-deploy/actions/post-deploy@v9
+        uses: ./actions/post-deploy
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Draft release
@@ -202,7 +202,7 @@ jobs:
       contents: write
       security-events: write
       actions: read
-    uses: navikt/pam-deploy/.github/workflows/codeql.yml@v9
+    uses: ./.github/workflows/codeql.yml
     with:
       LANGUAGE: "node"
       BUILD_CACHE: ${{ inputs.PACKAGE_MANAGER }}

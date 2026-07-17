@@ -38,7 +38,7 @@ jobs:
         with:
           persist-credentials: false
       - name: test pre-deploy
-        uses: navikt/pam-deploy/actions/pre-deploy@v9
+        uses: ./actions/pre-deploy
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DRY_RUN: true
@@ -49,12 +49,12 @@ jobs:
           echo $APPLICATION
           echo $DRAFTS_MAX
       - name: test post-deploy
-        uses: navikt/pam-deploy/actions/post-deploy@v9
+        uses: ./actions/post-deploy
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DRY_RUN: true
       - name: test post-production
-        uses: navikt/pam-deploy/actions/post-production@v9
+        uses: ./actions/post-production
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DRY_RUN: true
