@@ -1,0 +1,16 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Europe/Oslo
+    labels:
+      - dependencies
+    # Group all action updates into a single PR to reduce noise
+    groups:
+      github-actions:
+        patterns:
+          - "*"
