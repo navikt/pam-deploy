@@ -124,7 +124,7 @@ jobs:
           OPTIONAL_SECRET: ${{ secrets.OPTIONAL_SECRET }}
           READER_TOKEN: ${{ secrets.READER_TOKEN }}
       - name: Pre-deploy
-        uses: ./actions/pre-deploy
+        uses: navikt/pam-deploy/actions/pre-deploy@v9
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TEAM: ${{ inputs.TEAM }}
@@ -168,7 +168,7 @@ jobs:
           RESOURCE: ${{ inputs.NAIS_RESOURCE }}
           VARS: ${{ inputs.NAIS_VARS }}
       - name: Post-deploy
-        uses: ./actions/post-deploy
+        uses: navikt/pam-deploy/actions/post-deploy@v9
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Draft release
@@ -195,7 +195,7 @@ jobs:
       contents: write
       security-events: write
       actions: read
-    uses: ./.github/workflows/codeql.yml
+    uses: navikt/pam-deploy/.github/workflows/codeql.yml@v9
     with:
       LANGUAGE: ${{ inputs.LANGUAGE }}
       JAVA_DISTRIBUTION: ${{ inputs.JAVA_DISTRIBUTION }}
