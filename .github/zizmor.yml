@@ -5,14 +5,12 @@
 # navikt/pam-deploy/actions/pre-deploy@v10) — that tag is created by this repo's
 # own tag-and-release workflow, so a commit SHA cannot exist before the release.
 # We therefore require hash-pins for all third-party actions but allow ref-pins
-# for our own first-party references. Some NAIS-maintained actions also publish
-# moving major tags (v0/v2), so those are explicitly allowed as ref-pins.
+# for our own first-party references. NAIS-maintained actions also publish
+# moving major tags, so those are allowed as ref-pins too.
 rules:
   unpinned-uses:
     config:
       policies:
         "navikt/pam-deploy/*": ref-pin
-        "nais/login": ref-pin
-        "nais/docker-build-push": ref-pin
-        "nais/deploy/*": ref-pin
+        "nais/*": ref-pin
         "*": hash-pin
