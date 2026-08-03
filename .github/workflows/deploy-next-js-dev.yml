@@ -60,23 +60,23 @@ jobs:
     outputs:
       image: ${{ steps.docker-build-push.outputs.image }}
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
           persist-credentials: false
       - name: Install pnpm
-        uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6
+        uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
         if: ${{ inputs.PACKAGE_MANAGER == 'pnpm' }}
         with:
           run_install: false
       - name: Setup Node
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: ${{ inputs.NODE_VERSION }}
           cache: ${{ inputs.PACKAGE_MANAGER }}
       - name: Next.js npm cache
         if: ${{ inputs.PACKAGE_MANAGER == 'npm' }}
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: |
             ~/.npm
@@ -94,7 +94,7 @@ jobs:
           npm ci
       - name: Next.js pnpm cache
         if: ${{ inputs.PACKAGE_MANAGER == 'pnpm' }}
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: |
             ${{ github.workspace }}/.next/cache
@@ -142,13 +142,13 @@ jobs:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: ${{ secrets.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY || '' }}
       - name: Upload static files to CDN
-        uses: nais/deploy/actions/cdn-upload/v2@2d18f050f07b6a007864c6a57070ed915d571beb # v2
+        uses: nais/deploy/actions/cdn-upload/v2@v2
         with:
           team: ${{ inputs.TEAM }}
           source: ./.next/static
           destination: /${{github.event.repository.name}}/_next
       - name: docker-build-push
-        uses: nais/docker-build-push@31c3a7321909bcb20799fdf46153fec721fd9512 # v0
+        uses: nais/docker-build-push@v0
         id: docker-build-push
         with:
           team: ${{ inputs.TEAM }}
@@ -168,7 +168,7 @@ jobs:
           sarif_file: "trivy.sarif"
           category: "trivy-image"
       - name: Deploy to dev-gcp
-        uses: nais/deploy/actions/deploy@2d18f050f07b6a007864c6a57070ed915d571beb # v2
+        uses: nais/deploy/actions/deploy@v2
         env:
           CLUSTER: "dev-gcp"
           RESOURCE: ${{ inputs.NAIS_RESOURCE }}
