@@ -56,7 +56,7 @@ jobs:
           ignore-unfixed: true
           exit-code: "0"
       - name: Upload results to GitHub Security
-        uses: github/codeql-action/upload-sarif@e4fba868fa4b1b91e1fdab776edc8cfbe6e9fb81 # v4
+        uses: github/codeql-action/upload-sarif@e4fba868fa4b1b91e1fdab776edc8cfbe6e9fb81 # v4.37.3
         with:
           sarif_file: "trivy.sarif"
           category: "trivy-scheduled"
