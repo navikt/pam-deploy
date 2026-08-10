@@ -65,7 +65,7 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
       - name: Install pnpm
-        uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
         if: ${{ inputs.PACKAGE_MANAGER == 'pnpm' }}
         with:
           run_install: false
@@ -163,7 +163,7 @@ jobs:
           ignore-unfixed: true
           exit-code: "0"
       - name: Upload Trivy results to GitHub Security
-        uses: github/codeql-action/upload-sarif@e4fba868fa4b1b91e1fdab776edc8cfbe6e9fb81 # v4.37.3
+        uses: github/codeql-action/upload-sarif@d1ba80a13dd99fba24a470575428917156a28b43 # v4.37.5
         with:
           sarif_file: "trivy.sarif"
           category: "trivy-image"
