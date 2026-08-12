@@ -185,10 +185,15 @@ jobs:
           DRAFT_NAME: ${{ env.DRAFT_NAME }}
         run: |
           notes_file="$(mktemp)"
-          gh api "repos/$GITHUB_REPOSITORY/releases/generate-notes" \
-            -f tag_name="$VERSION_TAG" \
-            -f target_commitish="$GITHUB_SHA" \
-            --jq '.body' > "$notes_file"
+          previous_ref="$(gh api "repos/$GITHUB_REPOSITORY/releases/latest" --jq '.tag_name' 2>/dev/null || true)"
+          if [ -z "$previous_ref" ] || ! git rev-parse -q --verify "$previous_ref^{commit}" >/dev/null; then
+            previous_ref="$(git rev-list --max-parents=0 HEAD | tail -n 1)"
+          fi
+          {
+            echo "[$VERSION_TAG](https://github.com/$GITHUB_REPOSITORY/tree/$VERSION_TAG)"
+            echo "[Full Changelog](https://github.com/$GITHUB_REPOSITORY/compare/$previous_ref...$VERSION_TAG)"
+            git log "$previous_ref..$GITHUB_SHA" --no-merges --pretty=format:'* %ad %s' -50 --date=short | sed '/^[[:space:]]*$/d'
+          } > "$notes_file"
           if gh release view "$VERSION_TAG" >/dev/null 2>&1; then
             gh release edit "$VERSION_TAG" --title "$DRAFT_NAME" --notes-file "$notes_file" --draft
           else
