@@ -88,6 +88,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     environment: ${{ inputs.CLUSTER }}
+    concurrency:
+      group: deploy-${{ inputs.CLUSTER }}-${{ inputs.IMAGE_SUFFIX || github.repository }}
+      cancel-in-progress: false
     outputs:
       image: ${{ steps.docker-build-push.outputs.image }}
     steps:
