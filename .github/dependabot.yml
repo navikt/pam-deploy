@@ -16,3 +16,22 @@ updates:
       github-actions:
         patterns:
           - "*"
+
+  - package-ecosystem: docker
+    directories:
+      - /actions/documentation
+      - /actions/post-deploy
+      - /actions/post-production
+      - /actions/pre-deploy
+      - /actions/pre-production
+    schedule:
+      interval: daily
+      time: "06:00"
+      timezone: Europe/Oslo
+    labels:
+      - dependencies
+    # Group all base image digest updates into a single PR to reduce noise
+    groups:
+      docker:
+        patterns:
+          - "*"
