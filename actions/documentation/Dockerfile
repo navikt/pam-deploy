@@ -1,4 +1,4 @@
-FROM cgr.dev/chainguard/go:latest-dev@sha256:6b7213558968be4f8515548fafae9c7e5408d9ea556d0d97d6a457029b645d51 AS build
+FROM cgr.dev/chainguard/go:latest-dev@sha256:cf151b2ff33809a53bcc6352475bb90f269a54e1f6291c177ab726a932711411 AS build
 
 WORKDIR /app
 
@@ -11,7 +11,7 @@ COPY *.go ./
 RUN go build -o /naisparser
 
 
-FROM cgr.dev/chainguard/wolfi-base@sha256:1d95114038f76513a9ace6fca107d5582b08c65981f81f61cb56bf7fd2ef216d
+FROM cgr.dev/chainguard/wolfi-base@sha256:b6bfe8564bb0630778b04df06b42e78acf221e9540703cfc03d040ab7f91e357
 
 RUN apk add --no-cache bash curl jq sed git tzdata
 
