@@ -45,7 +45,7 @@ jobs:
           fetch-depth: 0
           ref: ${{ env.VERSION_TAG }}
           persist-credentials: false
-      - uses: nais/deploy/actions/deploy@v2
+      - uses: nais/deploy/actions/deploy@v3
         name: deploy to ${{ inputs.CLUSTER }}
         env:
           CLUSTER: ${{ inputs.CLUSTER }}

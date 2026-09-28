@@ -142,7 +142,7 @@ jobs:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: ${{ secrets.NEXT_SERVER_ACTIONS_ENCRYPTION_KEY || '' }}
       - name: Upload static files to CDN
-        uses: nais/deploy/actions/cdn-upload/v2@v2
+        uses: nais/deploy/actions/cdn-upload/v2@v3
         with:
           team: ${{ inputs.TEAM }}
           source: ./.next/static
@@ -163,12 +163,12 @@ jobs:
           ignore-unfixed: true
           exit-code: "0"
       - name: Upload Trivy results to GitHub Security
-        uses: github/codeql-action/upload-sarif@b96794f015dfd88f77b49b1c93e0fa7110f94c63 # v4.38.0
+        uses: github/codeql-action/upload-sarif@1c5b675653bb5c22dbe9b12b556ec555138e09fd # v4.38.1
         with:
           sarif_file: "trivy.sarif"
           category: "trivy-image"
       - name: Deploy to dev-gcp
-        uses: nais/deploy/actions/deploy@v2
+        uses: nais/deploy/actions/deploy@v3
         env:
           CLUSTER: "dev-gcp"
           RESOURCE: ${{ inputs.NAIS_RESOURCE }}
