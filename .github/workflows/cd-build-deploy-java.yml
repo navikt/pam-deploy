@@ -1,0 +1,125 @@
+name: cd-build-deploy-java
+on:
+  workflow_call:
+    inputs:
+      BUILD_SCRIPT:
+        description: "Byggeskript i repoet som bygger og tester"
+        required: false
+        type: string
+        default: "./build.sh"
+      JAVA_VERSION:
+        required: false
+        type: string
+        default: "25"
+    secrets:
+      READER_TOKEN:
+        required: false
+    outputs:
+      image:
+        description: "Image bygget og deployet til dev og prod"
+        value: ${{ jobs.build.outputs.image }}
+      version_tag:
+        description: "Versjonstag brukt for image og git-tag"
+        value: ${{ jobs.build.outputs.version_tag }}
+
+jobs:
+  detect:
+    concurrency:
+      group: detect-${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      build_tool: ${{ steps.detect.outputs.build_tool }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Detect gradle or maven
+        id: detect
+        run: |
+          gradle=false; maven=false
+          if [ -f build.gradle.kts ] || [ -f build.gradle ] || [ -f settings.gradle.kts ] || [ -f settings.gradle ]; then gradle=true; fi
+          if [ -f pom.xml ]; then maven=true; fi
+          if [ "$gradle" = true ] && [ "$maven" = true ]; then
+            echo "::error::Fant både gradle- og maven-prosjekt i repo-roten. Fjern ett av dem."
+            exit 1
+          elif [ "$gradle" = true ]; then
+            build_tool=gradle
+          elif [ "$maven" = true ]; then
+            build_tool=maven
+          else
+            echo "::error::Fant verken gradle-prosjekt (build.gradle[.kts]/settings.gradle[.kts]) eller maven-prosjekt (pom.xml) i repo-roten."
+            exit 1
+          fi
+          echo "Detected $build_tool"
+          echo "build_tool=$build_tool" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: detect
+    # Nyere run kansellerer eldre bygg, slik at bygg (og dermed deploy) skjer i commit-rekkefølge
+    concurrency:
+      group: build-${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
+    permissions:
+      contents: read
+      id-token: write # nais/docker-build-push
+      security-events: write # sarif
+      actions: read # sarif
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      image: ${{ steps.build-image.outputs.image }}
+      version_tag: ${{ steps.build-image.outputs.version_tag }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Setup java
+        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
+        with:
+          distribution: temurin
+          java-version: ${{ inputs.JAVA_VERSION }}
+          cache: ${{ (needs.detect.outputs.build_tool == 'maven' && 'maven') || '' }}
+      - name: Setup gradle
+        if: ${{ needs.detect.outputs.build_tool == 'gradle' }}
+        uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6.3.0
+      - name: Build and test
+        run: bash -eo pipefail -c "$BUILD_SCRIPT"
+        env:
+          BUILD_SCRIPT: ${{ inputs.BUILD_SCRIPT }}
+          READER_TOKEN: ${{ secrets.READER_TOKEN }}
+      - name: Build, push and scan image
+        id: build-image
+        uses: navikt/pam-deploy/actions/build-image@v9
+        with:
+          reader_token: ${{ secrets.READER_TOKEN }}
+
+  deploy:
+    needs: build
+    permissions:
+      contents: write # git tag
+      id-token: write
+    uses: navikt/pam-deploy/.github/workflows/cd-deploy.yml@v9
+    with:
+      IMAGE: ${{ needs.build.outputs.image }}
+      VERSION_TAG: ${{ needs.build.outputs.version_tag }}
+
+  # codeql.yml sender også inn dependency graph for gradle/maven
+  CodeQL:
+    needs: detect
+    permissions:
+      contents: write
+      security-events: write
+      actions: read
+    uses: navikt/pam-deploy/.github/workflows/codeql.yml@v9
+    with:
+      LANGUAGE: java
+      JAVA_DISTRIBUTION: temurin
+      JAVA_VERSION: ${{ inputs.JAVA_VERSION }}
+      BUILD_CACHE: ${{ needs.detect.outputs.build_tool }}
+      BUILD_SCRIPT: ${{ inputs.BUILD_SCRIPT }}
+    secrets:
+      READER_TOKEN: ${{ secrets.READER_TOKEN }}

@@ -1,0 +1,65 @@
+name: 'build-and-scan-image'
+description: 'Lager versjonstag, bygger og pusher image + SBOM, og skanner imaget med Trivy. Krever id-token: write og security-events: write.'
+inputs:
+  team:
+    description: 'Nais-team som eier imaget'
+    required: false
+    default: 'teampam'
+  reader_token:
+    description: 'Token for å lese private pakker (GitHub Packages) i Docker-bygget'
+    required: false
+    default: ''
+outputs:
+  image:
+    description: 'Bygget image'
+    value: ${{ steps.docker-build-push.outputs.image }}
+  version_tag:
+    description: 'Versjonstag brukt for imaget'
+    value: ${{ steps.version.outputs.version_tag }}
+runs:
+  using: 'composite'
+  steps:
+    - name: Set version tag
+      id: version
+      shell: bash
+      run: |
+        VERSION_TAG="$(TZ=Europe/Oslo date +"%y.%j.%H%M%S")"
+        echo "version_tag=$VERSION_TAG" >> "$GITHUB_OUTPUT"
+    - name: Build and push docker image + SBOM
+      uses: nais/docker-build-push@v0
+      id: docker-build-push
+      with:
+        team: ${{ inputs.team }}
+        tag: ${{ steps.version.outputs.version_tag }}
+        pull: true
+        build_args: |
+          "VERSION_TAG=${{ steps.version.outputs.version_tag }}"
+        build_secrets: |
+          "reader_token=${{ inputs.reader_token }}"
+          "npm_auth_token=${{ inputs.reader_token }}"
+    - name: Trivy secret scan
+      uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+      with:
+        image-ref: ${{ steps.docker-build-push.outputs.image }}
+        format: 'sarif'
+        scanners: 'secret'
+        output: 'trivy-secret.sarif'
+    - name: Upload Trivy secret results to GitHub Security
+      uses: github/codeql-action/upload-sarif@b96794f015dfd88f77b49b1c93e0fa7110f94c63 # v4.38.0
+      with:
+        sarif_file: 'trivy-secret.sarif'
+        category: 'trivy-image-secret'
+    - name: Trivy image scan
+      uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+      with:
+        image-ref: ${{ steps.docker-build-push.outputs.image }}
+        format: 'sarif'
+        scanners: 'vuln'
+        output: 'trivy.sarif'
+        ignore-unfixed: true
+        exit-code: '0'
+    - name: Upload Trivy results to GitHub Security
+      uses: github/codeql-action/upload-sarif@b96794f015dfd88f77b49b1c93e0fa7110f94c63 # v4.38.0
+      with:
+        sarif_file: 'trivy.sarif'
+        category: 'trivy-image'
