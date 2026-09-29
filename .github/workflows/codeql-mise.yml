@@ -1,0 +1,76 @@
+name: codeql-mise
+# CodeQL-analyse basert på mise. Språk utledes fra [tools] i mise-config (java → java-kotlin, node → javascript-typescript).
+# Java-kotlin bygges med `mise run build`. Kalles fra cd-build-deploy.yml, men kan også kalles direkte (f.eks. på pull_request/schedule).
+on:
+  workflow_call:
+    secrets:
+      READER_TOKEN:
+        required: false
+
+jobs:
+  # Matrisen må være kjent før analysejobben starter
+  detect:
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      codeql_languages: ${{ steps.detect.outputs.codeql_languages }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@9149ea85001c7435d5a66bb127d6a1b6227cb0a5 # v5.0.0
+        with:
+          install: false
+          cache: false
+      - name: Detect CodeQL languages from mise tools
+        id: detect
+        run: |
+          mise trust --all
+          codeql_languages=$(mise ls --current --json | jq -c '
+            [keys[] | sub("^core:"; "")
+              | if . == "java" then "java-kotlin"
+                elif . == "node" then "javascript-typescript"
+                else empty end] | unique')
+          echo "CodeQL-språk: $codeql_languages"
+          echo "codeql_languages=$codeql_languages" >> "$GITHUB_OUTPUT"
+
+  analyze:
+    name: CodeQL
+    needs: detect
+    if: ${{ needs.detect.outputs.codeql_languages != '[]' }}
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ${{ fromJSON(needs.detect.outputs.codeql_languages) }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Setup CodeQL
+        uses: github/codeql-action/init@b96794f015dfd88f77b49b1c93e0fa7110f94c63 # v4.38.0
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: ${{ (matrix.language == 'java-kotlin' && 'manual') || 'none' }}
+          queries: security-and-quality
+      - uses: jdx/mise-action@9149ea85001c7435d5a66bb127d6a1b6227cb0a5 # v5.0.0
+        if: ${{ matrix.language == 'java-kotlin' }}
+      - name: Setup gradle
+        if: ${{ matrix.language == 'java-kotlin' && hashFiles('build.gradle', 'build.gradle.kts', 'settings.gradle', 'settings.gradle.kts') != '' }}
+        uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6.3.0
+      - name: Build
+        if: ${{ matrix.language == 'java-kotlin' }}
+        run: mise run build
+        env:
+          READER_TOKEN: ${{ secrets.READER_TOKEN }}
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@b96794f015dfd88f77b49b1c93e0fa7110f94c63 # v4.38.0
+        with:
+          category: "/language:${{ matrix.language }}"

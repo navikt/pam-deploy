@@ -1,5 +1,5 @@
 name: 'build-and-scan-image'
-description: 'Lager versjonstag, bygger og pusher image + SBOM, og skanner imaget med Trivy. Krever id-token: write og security-events: write.'
+description: 'Bygger og pusher image + SBOM, og skanner imaget med Trivy. Krever id-token: write og security-events: write.'
 inputs:
   team:
     description: 'Nais-team som eier imaget'
@@ -11,29 +11,17 @@ inputs:
     default: ''
 outputs:
   image:
-    description: 'Bygget image'
+    description: 'Bygget image (med digest)'
     value: ${{ steps.docker-build-push.outputs.image }}
-  version_tag:
-    description: 'Versjonstag brukt for imaget'
-    value: ${{ steps.version.outputs.version_tag }}
 runs:
   using: 'composite'
   steps:
-    - name: Set version tag
-      id: version
-      shell: bash
-      run: |
-        VERSION_TAG="$(TZ=Europe/Oslo date +"%y.%j.%H%M%S")"
-        echo "version_tag=$VERSION_TAG" >> "$GITHUB_OUTPUT"
     - name: Build and push docker image + SBOM
       uses: nais/docker-build-push@v0
       id: docker-build-push
       with:
         team: ${{ inputs.team }}
-        tag: ${{ steps.version.outputs.version_tag }}
         pull: true
-        build_args: |
-          "VERSION_TAG=${{ steps.version.outputs.version_tag }}"
         build_secrets: |
           "reader_token=${{ inputs.reader_token }}"
           "npm_auth_token=${{ inputs.reader_token }}"

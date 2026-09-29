@@ -14,24 +14,34 @@ An example that follow this release workflow and uses pam-deploy actions can be 
 
 ## Continuous deployment workflow
 Workflows prefikset med `cd-` er del av continuous deployment. Disse bygger ett image og deployer det til `dev-gcp` og deretter `prod-gcp`, uten draft release. Prod deployes kun fra
-`main`/`master` og kun hvis dev-deploy gikk ok. Etter prod-deploy tagges commiten.
+`main`/`master` og kun hvis dev-deploy gikk ok. Prod-deployer vises under *Deployments* i repoet (GitHub environment `prod-gcp`).
 
 | Fil | Innhold |
 |---|---|
-| `cd-build-deploy-java.yml` / `cd-build-deploy-node.yml` | bygg + image → `cd-deploy.yml`; CodeQL parallelt (blokkerer ikke deploy) |
-| `cd-deploy.yml` | felles deploy: dev → prod + git-tag. Kan kalles direkte med `IMAGE` og `VERSION_TAG` |
-| `actions/build-image` | versjonstag, image + SBOM, Trivy-skann |
+| `cd-build-deploy.yml` | `mise run build` + image → `cd-deploy.yml`; `codeql-mise.yml` og dependency graph parallelt (blokkerer ikke deploy) |
+| `cd-deploy.yml` | felles deploy: dev → prod. Kan kalles direkte med `IMAGE` |
+| `codeql-mise.yml` | CodeQL med mise. Kan også kalles direkte, f.eks. på `pull_request`/`schedule` (permissions: `contents: read`, `security-events: write`, `actions: read`) |
+| `actions/build-image` | image + SBOM, Trivy-skann |
 
-- **Byggeverktøy** oppdages fra repo-roten: gradle (`build.gradle[.kts]`/`settings.gradle[.kts]`) eller maven (`pom.xml`),
-  pnpm (`pnpm-lock.yaml`) eller npm (`package-lock.json`). Feiler ved ingen eller flere treff, og for yarn.
+- **Bygg med [mise](https://mise.jdx.dev):** `mise.toml` i repo-roten må ha verktøy under `[tools]` og en `build`-task.
+  Verktøy installeres og caches av mise; `mise.lock` brukes (`--locked`) hvis den finnes.
+- **CodeQL-språk** utledes fra `[tools]`: `java` → java-kotlin, `node` → javascript-typescript.
+  **Dependency graph** sendes inn for gradle eller maven (oppdaget fra `build.gradle[.kts]`/`settings.gradle[.kts]`/`pom.xml`).
 - **Konvensjoner:** team `teampam`, `Dockerfile` i roten, GitHub environments `dev-gcp`/`prod-gcp`, og
   `nais apply` med [mixins](https://doc.nais.io/build/how-to/deploy-pipeline/): `.nais/app.yaml` + `.nais/app.<env>.yaml`.
 - **Rekkefølge:** nyere kjøring på samme branch kansellerer eldre bygg, så prod får aldri et eldre image. Dev-deploy
   køes per branch; to branches kan dermed deploye til dev samtidig.
-- `deploy-rollback.yml` bruker fortsatt `NAIS_RESOURCE`/`NAIS_VARS`, ikke mixins.
 
-Inputs: `BUILD_SCRIPT` (default `./build.sh`), `JAVA_VERSION` (`25`, temurin) / `NODE_VERSION` (`22`).
-Valgfri secret: `READER_TOKEN`.
+Ingen inputs. Valgfri secret: `READER_TOKEN` (tilgjengelig som env i `mise run build` og som build secret i Docker).
+
+```toml
+# mise.toml
+[tools]
+java = "25"
+
+[tasks.build]
+run = "./gradlew test installDist"
+```
 
 ```yaml
 on:
@@ -44,7 +54,7 @@ jobs:
       id-token: write
       security-events: write
       actions: read
-    uses: navikt/pam-deploy/.github/workflows/cd-build-deploy-java.yml@v9 # eller cd-build-deploy-node.yml
+    uses: navikt/pam-deploy/.github/workflows/cd-build-deploy.yml@v9
     secrets:
       READER_TOKEN: ${{ secrets.READER_TOKEN }}
 ```

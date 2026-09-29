@@ -1,0 +1,83 @@
+name: cd-build-deploy
+# Bygg med mise og deploy automatisk til dev-gcp og deretter prod-gcp.
+# Krever mise-config (f.eks. mise.toml) med verktøy under [tools] og en build-task ([tasks.build]).
+# CodeQL (codeql-mise.yml) og dependency graph kjører parallelt og blokkerer ikke deploy.
+on:
+  workflow_call:
+    secrets:
+      READER_TOKEN:
+        required: false
+    outputs:
+      image:
+        description: "Image bygget og deployet til dev og prod"
+        value: ${{ jobs.build.outputs.image }}
+
+jobs:
+  build:
+    # Nyere run kansellerer eldre bygg, slik at bygg (og dermed deploy) skjer i commit-rekkefølge
+    concurrency:
+      group: build-${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
+    permissions:
+      contents: read
+      id-token: write # nais/docker-build-push
+      security-events: write # sarif
+      actions: read # sarif
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      image: ${{ steps.build-image.outputs.image }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@9149ea85001c7435d5a66bb127d6a1b6227cb0a5 # v5.0.0
+      - name: Setup gradle
+        if: ${{ hashFiles('build.gradle', 'build.gradle.kts', 'settings.gradle', 'settings.gradle.kts') != '' }}
+        uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6.3.0
+      - name: Build and test
+        run: mise run build
+        env:
+          READER_TOKEN: ${{ secrets.READER_TOKEN }}
+      - name: Build, push and scan image
+        id: build-image
+        uses: navikt/pam-deploy/actions/build-image@v9
+        with:
+          reader_token: ${{ secrets.READER_TOKEN }}
+
+  deploy:
+    needs: build
+    permissions:
+      contents: read
+      id-token: write
+    uses: navikt/pam-deploy/.github/workflows/cd-deploy.yml@v9
+    with:
+      IMAGE: ${{ needs.build.outputs.image }}
+
+  codeql:
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+    uses: navikt/pam-deploy/.github/workflows/codeql-mise.yml@v9
+    secrets:
+      READER_TOKEN: ${{ secrets.READER_TOKEN }}
+
+  # Kjører alltid; stegene hoppes over hvis repoet verken er gradle eller maven
+  dependency-graph:
+    permissions:
+      contents: write # dependency submission
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@9149ea85001c7435d5a66bb127d6a1b6227cb0a5 # v5.0.0
+        if: ${{ hashFiles('build.gradle', 'build.gradle.kts', 'settings.gradle', 'settings.gradle.kts', 'pom.xml') != '' }}
+      - name: Gradle dependency submission
+        if: ${{ hashFiles('build.gradle', 'build.gradle.kts', 'settings.gradle', 'settings.gradle.kts') != '' }}
+        uses: gradle/actions/dependency-submission@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6.3.0
+      - name: Maven dependency submission
+        if: ${{ hashFiles('pom.xml') != '' }}
+        uses: advanced-security/maven-dependency-submission-action@a64327a7329c9939cf675e458452febe1894a70c # v6.0.1

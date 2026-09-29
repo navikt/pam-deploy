@@ -6,10 +6,6 @@ on:
         description: "Image som skal deployes"
         required: true
         type: string
-      VERSION_TAG:
-        description: "Versjonstag som commiten tagges med etter prod-deploy"
-        required: true
-        type: string
 
 env:
   TEAM: teampam
@@ -43,7 +39,7 @@ jobs:
     needs: deploy-dev
     if: ${{ needs.deploy-dev.result == 'success' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master') }}
     permissions:
-      contents: write # git tag
+      contents: read
       id-token: write
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -62,8 +58,3 @@ jobs:
         env:
           IMAGE: ${{ inputs.IMAGE }}
         run: nais apply "$NAIS_MANIFEST" --environment prod-gcp --set spec.image="$IMAGE" --wait
-      - name: Tag commit with version
-        uses: navikt/pam-deploy/actions/post-deploy@v9
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION_TAG: ${{ inputs.VERSION_TAG }}
