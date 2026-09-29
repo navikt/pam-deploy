@@ -46,7 +46,7 @@ jobs:
         env:
           TEAM: ${{ inputs.TEAM }}
           IMAGE_SUFFIX: ${{ inputs.IMAGE_SUFFIX }}
-      - uses: nais/deploy/actions/deploy@v2
+      - uses: nais/deploy/actions/deploy@v3
         name: deploy to ${{ inputs.CLUSTER }}
         env:
           CLUSTER: ${{ inputs.CLUSTER }}
