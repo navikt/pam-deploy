@@ -3,7 +3,6 @@ updates:
   - package-ecosystem: github-actions
     directories:
       - /
-      - /actions/build-image
     schedule:
       interval: weekly
       day: monday
