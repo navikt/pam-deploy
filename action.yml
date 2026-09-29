@@ -1,7 +1,4 @@
-name: cd-build-deploy
-# Bygg med mise og deploy automatisk til dev-gcp og deretter prod-gcp.
-# Krever mise-config (f.eks. mise.toml) med verktøy under [tools] og en build-task ([tasks.build]).
-# CodeQL (codeql-mise.yml) og dependency graph kjører parallelt og blokkerer ikke deploy.
+name: pam-deploy
 on:
   workflow_call:
     inputs:
