@@ -30,10 +30,25 @@ on:
 jobs:
   build-deploy:
     permissions:
-      contents: write
+      contents: read
       id-token: write
       security-events: write
       actions: read
     secrets: inherit
-    uses: navikt/pam-deploy@v9
+    uses: navikt/pam-deploy/.github/workflows/build-deploy.yml@v9
+```
+
+For repos with multiple apps, list each app's folder at the repo root in a matrix. The folder name becomes
+the image suffix, and `<folder>/Dockerfile` is built with the repo root as context.
+
+```yaml
+jobs:
+  build-deploy:
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [app-a, app-b]
+    uses: navikt/pam-deploy/.github/workflows/build-deploy.yml@v9
+    with:
+      working_directory: ${{ matrix.app }}
 ```
