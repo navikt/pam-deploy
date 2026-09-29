@@ -24,6 +24,7 @@ run = "./gradlew test installDist"
 ```
 
 ```yaml
+# .github/workflows/main.yml
 on:
   push:
     branches: [main]
@@ -34,14 +35,34 @@ jobs:
       id-token: write
       security-events: write
       actions: read
-    secrets: inherit
     uses: navikt/pam-deploy/.github/workflows/build-deploy.yml@v9
+    # (optional) secrets to build the app
+    secrets:
+      READER_TOKEN: ${{ secrets.READER_TOKEN }}
 ```
 
 For repos with multiple apps, list each app's folder at the repo root in a matrix. The folder name becomes
 the image suffix, and `<folder>/Dockerfile` is built with the repo root as context.
 
+Each app has its own `mise.toml` and `.nais/` in its folder. The build task runs from the app's folder, so Gradle
+only builds that app and the modules it depends on. `buildNeeded` also runs the tests of those modules.
+
+```toml
+# app-a/mise.toml
+[tools]
+java = "25"
+
+[tasks.build]
+run = "../gradlew buildNeeded"
+```
+
+```dockerfile
+# app-a/Dockerfile
+COPY app-a/build/libs/app-a-all.jar /app.jar
+```
+
 ```yaml
+# .github/workflows/main.yml
 jobs:
   build-deploy:
     strategy:
