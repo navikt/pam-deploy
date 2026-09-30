@@ -28,6 +28,7 @@ run = "./gradlew test installDist"
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 jobs:
   build-deploy:
     permissions:
@@ -40,6 +41,10 @@ jobs:
     secrets:
       READER_TOKEN: ${{ secrets.READER_TOKEN }}
 ```
+
+The image is built and deployed on `push` and `workflow_dispatch`. Pull requests only build and test. Add
+`workflow_dispatch` to the caller's triggers to allow manual redeploys, or to deploy after merges made with
+`GITHUB_TOKEN` (such as Dependabot auto-merge), since those don't trigger `push` workflows.
 
 For repos with multiple apps, list each app's folder at the repo root in a matrix. The folder name becomes
 the image suffix, and `<folder>/Dockerfile` is built with the repo root as context.
