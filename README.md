@@ -27,8 +27,11 @@ run = "./gradlew test installDist"
 # .github/workflows/main.yml
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+      - feature/**
   workflow_dispatch:
+
 jobs:
   build-deploy:
     permissions:
@@ -68,6 +71,13 @@ COPY app-a/build/libs/app-a-all.jar /app.jar
 
 ```yaml
 # .github/workflows/main.yml
+on:
+  push:
+    branches:
+      - main
+      - feature/**
+  workflow_dispatch:
+
 jobs:
   build-deploy:
     strategy:
