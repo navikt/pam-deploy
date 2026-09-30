@@ -12,5 +12,28 @@ the deploy to production github action.
 An example that follow this release workflow and uses pam-deploy actions can be seen 
 [here](https://github.com/navikt/pam-import-api/tree/master/.github/workflows)
 
+## Continuous deployment workflow
 
+```toml
+# mise.toml
+[tools]
+java = "25"
 
+[tasks.build]
+run = "./gradlew test installDist"
+```
+
+```yaml
+on:
+  push:
+    branches: [main]
+jobs:
+  build-deploy:
+    permissions:
+      contents: write
+      id-token: write
+      security-events: write
+      actions: read
+    secrets: inherit
+    uses: navikt/pam-deploy@v9
+```

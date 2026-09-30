@@ -1,0 +1,95 @@
+name: pam-deploy
+on:
+  workflow_call:
+    inputs:
+      working_directory:
+        required: false
+        type: string
+        default: "./"
+      team:
+        required: false
+        type: string
+        default: "teampam"
+    secrets:
+      READER_TOKEN:
+        required: false
+    outputs:
+      image:
+        description: "Image bygget og deployet til dev og prod"
+        value: ${{ jobs.build.outputs.image }}
+
+defaults:
+  run:
+    working-directory: ${{ inputs.working_directory }}
+
+jobs:
+  build:
+    permissions:
+      contents: read
+      id-token: write
+      security-events: write
+      actions: read
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      image: ${{ steps.build-image.outputs.image }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@9149ea85001c7435d5a66bb127d6a1b6227cb0a5 # v5.0.0
+      - uses: github/codeql-action/init@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4.38.2
+        continue-on-error: true
+      - name: Build and test
+        run: mise run build
+        env:
+          READER_TOKEN: ${{ secrets.READER_TOKEN }}
+      - uses: nais/docker-build-push@423a915c9b72edf2ba848b88171ccb0489e2a40a # v0
+        if: github.event_name == 'push'
+        id: docker-build-push
+        with:
+          team: ${{ inputs.team }}
+
+  deploy-dev:
+    needs: build
+    if: github.event_name == 'push'
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: dev-gcp
+    concurrency:
+      group: deploy-dev-gcp-${{ inputs.working_directory }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: nais/setup@ea33c90b68228e6f04fb34b88bfd8ab6ad523ce8 # v1.0.2
+        with:
+          team: ${{ inputs.team }}
+      - name: Deploy to dev-gcp
+        run: nais apply .nais/app.yaml --environment dev-gcp --set spec.image="${{ steps.build-image.outputs.image }}" --wait
+
+  deploy-prod:
+    needs: deploy-dev
+    if: github.ref_name == github.event.repository.default_branch
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: prod-gcp
+    concurrency:
+      group: deploy-prod-gcp-${{ inputs.working_directory }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: nais/setup@ea33c90b68228e6f04fb34b88bfd8ab6ad523ce8 # v1.0.2
+        with:
+          team: ${{ inputs.team }}
+      - name: Deploy to prod-gcp
+        run: nais apply .nais/app.yaml --environment prod-gcp --set spec.image="${{ steps.build-image.outputs.image }}" --wait
