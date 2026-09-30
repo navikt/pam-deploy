@@ -5,11 +5,19 @@ on:
       working_directory:
         required: false
         type: string
-        default: "./"
+        default: "."
       team:
         required: false
         type: string
         default: "teampam"
+      cdn_upload_source:
+        required: false
+        type: string
+        default: ""
+      cdn_upload_destination:
+        required: false
+        type: string
+        default: ""
     secrets:
       READER_TOKEN:
         required: false
@@ -17,10 +25,6 @@ on:
       image:
         description: "Image bygget og deployet til dev og prod"
         value: ${{ jobs.build.outputs.image }}
-
-defaults:
-  run:
-    working-directory: ${{ inputs.working_directory }}
 
 jobs:
   build:
@@ -30,25 +34,42 @@ jobs:
       security-events: write
       actions: read
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ inputs.working_directory }}
     timeout-minutes: 30
     outputs:
-      image: ${{ steps.build-image.outputs.image }}
+      image: ${{ steps.docker-build-push.outputs.image }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - uses: jdx/mise-action@9149ea85001c7435d5a66bb127d6a1b6227cb0a5 # v5.0.0
+        with:
+          working_directory: ${{ inputs.working_directory }}
       - uses: github/codeql-action/init@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4.38.2
         continue-on-error: true
       - name: Build and test
         run: mise run build
         env:
           READER_TOKEN: ${{ secrets.READER_TOKEN }}
+      - uses: github/codeql-action/analyze@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4.38.2
+        continue-on-error: true
+        with:
+          category: /app:${{ inputs.working_directory }}
+      - uses: nais/deploy/actions/cdn-upload/v2@9850be311389ca754d9a9f2280615419d738c891 # v3
+        if: github.event_name == 'push' && inputs.cdn_upload_source != '' && inputs.cdn_upload_destination != ''
+        with:
+          team: ${{ inputs.team }}
+          source: ${{ inputs.cdn_upload_source }}
+          destination: /${{ github.event.repository.name }}/${{ inputs.cdn_upload_destination }}
       - uses: nais/docker-build-push@423a915c9b72edf2ba848b88171ccb0489e2a40a # v0
         if: github.event_name == 'push'
         id: docker-build-push
         with:
           team: ${{ inputs.team }}
+          dockerfile: ${{ inputs.working_directory }}/Dockerfile
+          image_suffix: ${{ inputs.working_directory != '.' && inputs.working_directory || '' }}
 
   deploy-dev:
     needs: build
@@ -57,6 +78,9 @@ jobs:
       contents: read
       id-token: write
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ inputs.working_directory }}
     timeout-minutes: 20
     environment: dev-gcp
     concurrency:
@@ -70,15 +94,20 @@ jobs:
         with:
           team: ${{ inputs.team }}
       - name: Deploy to dev-gcp
-        run: nais apply .nais/app.yaml --environment dev-gcp --set spec.image="${{ steps.build-image.outputs.image }}" --wait
+        run: nais apply .nais/app.yaml --environment dev-gcp --set spec.image="$IMAGE" --wait
+        env:
+          IMAGE: ${{ needs.build.outputs.image }}
 
   deploy-prod:
-    needs: deploy-dev
+    needs: [build, deploy-dev]
     if: github.ref_name == github.event.repository.default_branch
     permissions:
       contents: read
       id-token: write
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ inputs.working_directory }}
     timeout-minutes: 20
     environment: prod-gcp
     concurrency:
@@ -92,4 +121,6 @@ jobs:
         with:
           team: ${{ inputs.team }}
       - name: Deploy to prod-gcp
-        run: nais apply .nais/app.yaml --environment prod-gcp --set spec.image="${{ steps.build-image.outputs.image }}" --wait
+        run: nais apply .nais/app.yaml --environment prod-gcp --set spec.image="$IMAGE" --wait
+        env:
+          IMAGE: ${{ needs.build.outputs.image }}
