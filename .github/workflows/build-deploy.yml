@@ -10,6 +10,14 @@ on:
         required: false
         type: string
         default: "teampam"
+      cdn_upload_source:
+        required: false
+        type: string
+        default: ""
+      cdn_upload_destination:
+        required: false
+        type: string
+        default: ""
     secrets:
       READER_TOKEN:
         required: false
@@ -49,6 +57,12 @@ jobs:
         continue-on-error: true
         with:
           category: /app:${{ inputs.working_directory }}
+      - uses: nais/deploy/actions/cdn-upload/v2@9850be311389ca754d9a9f2280615419d738c891 # v3
+        if: github.event_name == 'push' && inputs.cdn_upload_source != '' && inputs.cdn_upload_destination != ''
+        with:
+          team: ${{ inputs.team }}
+          source: ${{ inputs.cdn_upload_source }}
+          destination: /${{ github.event.repository.name }}/${{ inputs.cdn_upload_destination }}
       - uses: nais/docker-build-push@423a915c9b72edf2ba848b88171ccb0489e2a40a # v0
         if: github.event_name == 'push'
         id: docker-build-push
