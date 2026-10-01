@@ -58,13 +58,13 @@ jobs:
         with:
           category: /app:${{ inputs.working_directory }}
       - uses: nais/deploy/actions/cdn-upload/v2@9850be311389ca754d9a9f2280615419d738c891 # v3
-        if: github.event_name == 'push' && inputs.cdn_upload_source != '' && inputs.cdn_upload_destination != ''
+        if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && inputs.cdn_upload_source != '' && inputs.cdn_upload_destination != ''
         with:
           team: ${{ inputs.team }}
           source: ${{ inputs.cdn_upload_source }}
           destination: /${{ github.event.repository.name }}/${{ inputs.cdn_upload_destination }}
       - uses: nais/docker-build-push@423a915c9b72edf2ba848b88171ccb0489e2a40a # v0
-        if: github.event_name == 'push'
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         id: docker-build-push
         with:
           team: ${{ inputs.team }}
@@ -73,7 +73,7 @@ jobs:
 
   deploy-dev:
     needs: build
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     permissions:
       contents: read
       id-token: write
