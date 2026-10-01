@@ -8,6 +8,7 @@ on:
       - "CODEOWNERS"
     branches:
       - master
+  workflow_dispatch:
 jobs:
   tag-and-release:
     permissions:
