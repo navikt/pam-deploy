@@ -6,9 +6,6 @@ on:
       - ".github/workflows/**"
       - "actions/**"
   pull_request:
-    paths:
-      - ".github/workflows/**"
-      - "actions/**"
   schedule:
     - cron: "0 6 * * 1"
   workflow_dispatch:

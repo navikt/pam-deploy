@@ -8,7 +8,7 @@ jobs:
   auto-merge:
     if: github.event.pull_request.user.login == 'dependabot[bot]'
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 30
     permissions:
       actions: write
       contents: write
@@ -28,5 +28,6 @@ jobs:
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
           DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
         run: |
+          gh pr checks "$PR_NUMBER" --required --watch --fail-fast --interval 30
           gh pr merge "$PR_NUMBER" --squash --match-head-commit "$HEAD_SHA"
           gh workflow run tag-release-actions.yml --ref "$DEFAULT_BRANCH"
