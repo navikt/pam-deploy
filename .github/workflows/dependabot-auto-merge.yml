@@ -1,6 +1,4 @@
 name: dependabot-auto-merge
-# Auto-merges Dependabot PRs that only bump Docker base image digests.
-# Requires "Allow auto-merge" to be enabled in the repository settings.
 on:
   pull_request:
 
@@ -12,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
+      actions: write
       contents: write
       pull-requests: write
     steps:
@@ -20,9 +19,14 @@ jobs:
         uses: dependabot/fetch-metadata@25dd0e34f4fe68f24cc83900b1fe3fe149efef98 # v3.1.0
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Enable auto-merge for Docker digest updates
-        if: steps.metadata.outputs.package-ecosystem == 'docker'
+      - name: Merge PR
+        if: contains(fromJSON('["docker", "github_actions"]'), steps.metadata.outputs.package-ecosystem)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_URL: ${{ github.event.pull_request.html_url }}
-        run: gh pr merge --auto --squash "$PR_URL"
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          gh pr merge "$PR_NUMBER" --squash --match-head-commit "$HEAD_SHA"
+          gh workflow run tag-release-actions.yml --ref "$DEFAULT_BRANCH"
