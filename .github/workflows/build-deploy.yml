@@ -64,11 +64,11 @@ jobs:
           source: ${{ inputs.cdn_upload_source }}
           destination: /${{ github.event.repository.name }}/${{ inputs.cdn_upload_destination }}
       - uses: nais/docker-build-push@423a915c9b72edf2ba848b88171ccb0489e2a40a # v0
-        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         id: docker-build-push
         with:
           team: ${{ inputs.team }}
           dockerfile: ${{ inputs.working_directory }}/Dockerfile
+          push_image: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
           image_suffix: ${{ inputs.working_directory != '.' && inputs.working_directory || '' }}
 
   deploy-dev:
