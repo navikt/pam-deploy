@@ -47,14 +47,14 @@ jobs:
       - uses: jdx/mise-action@08ae2a091c038e1e05ec6f5115dc5c69d5a2a6b8 # v5.1.2
         with:
           working_directory: ${{ inputs.working_directory }}
-      - uses: navikt/pam-deploy/actions/dependency-cache/restore@v9
+      - uses: navikt/pam-deploy/actions/dependency-cache/restore@gradle-cache
         with:
           working_directory: ${{ inputs.working_directory }}
       - name: Build and test
         run: mise run build
         env:
           READER_TOKEN: ${{ secrets.READER_TOKEN }}
-      - uses: navikt/pam-deploy/actions/dependency-cache/save@v9
+      - uses: navikt/pam-deploy/actions/dependency-cache/save@gradle-cache
       - uses: nais/deploy/actions/cdn-upload/v2@d003bddf74ce5b96fa3056ae60bd4b9b3bbc89ef # v3
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && inputs.cdn_upload_source != '' && inputs.cdn_upload_destination != ''
         with:
