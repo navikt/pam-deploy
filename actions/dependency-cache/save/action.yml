@@ -1,5 +1,5 @@
 name: 'Save dependency cache'
-description: 'Saves the dependencies found by dependency-cache/restore. Only saves on the default branch, and only when the cache was missed.'
+description: 'Saves the dependencies found by dependency-cache/restore.'
 runs:
   using: 'composite'
   steps:
