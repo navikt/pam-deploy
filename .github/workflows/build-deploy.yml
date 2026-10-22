@@ -55,7 +55,7 @@ jobs:
         env:
           READER_TOKEN: ${{ secrets.READER_TOKEN }}
       - uses: $/actions/dependency-cache/save
-      - uses: nais/deploy/actions/cdn-upload/v2@d003bddf74ce5b96fa3056ae60bd4b9b3bbc89ef # v3
+      - uses: nais/deploy/actions/cdn-upload/v2@6a9dcd6df697ec2d38edc78cadb0b9acd1232f50 # v3
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && inputs.cdn_upload_source != '' && inputs.cdn_upload_destination != ''
         with:
           team: ${{ inputs.team }}
