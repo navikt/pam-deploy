@@ -16,9 +16,13 @@ runs:
         MAVEN: ${{ hashFiles('**/pom.xml') }}
         PNPM: ${{ hashFiles('**/pnpm-lock.yaml') }}
         BUILD_FILES_HASH: ${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties', 'gradle/*.versions.toml', '**/pom.xml', '**/.mvn/wrapper/maven-wrapper.properties', '**/.mvn/extensions.xml', '**/pnpm-lock.yaml') }}
+        WORKING_DIRECTORY: ${{ inputs.working_directory }}
       run: |
+        app="${WORKING_DIRECTORY//[,:]/_}"
+        prefix="dependencies-${RUNNER_OS}-${RUNNER_ARCH}-${app}:"
         {
-          echo "DEPENDENCY_CACHE_KEY=dependencies-${RUNNER_OS}-${RUNNER_ARCH}-${BUILD_FILES_HASH}"
+          echo "DEPENDENCY_CACHE_KEY_PREFIX=${prefix}"
+          echo "DEPENDENCY_CACHE_KEY=${prefix}${BUILD_FILES_HASH}"
           echo "DEPENDENCY_CACHE_PATHS<<EOF"
           if [ -n "$GRADLE" ]; then printf '%s\n' ~/.gradle/caches ~/.gradle/wrapper; fi
           if [ -n "$MAVEN" ]; then printf '%s\n' ~/.m2/repository ~/.m2/wrapper/dists; fi
@@ -34,6 +38,7 @@ runs:
       with:
         path: ${{ env.DEPENDENCY_CACHE_PATHS }}
         key: ${{ env.DEPENDENCY_CACHE_KEY }}
+        restore-keys: ${{ env.DEPENDENCY_CACHE_KEY_PREFIX }}
     - name: Mark dependency cache as hit
       if: steps.restore.outputs.cache-hit == 'true'
       shell: bash
