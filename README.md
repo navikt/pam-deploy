@@ -51,8 +51,7 @@ The image is built and deployed on `push` and `workflow_dispatch`. Pull requests
 
 Gradle (`gradlew`), Maven (`pom.xml`) and pnpm (`pnpm-lock.yaml`) dependencies are cached between builds with
 [`actions/dependency-cache`](actions/dependency-cache). The cache is keyed on the build files without fallback, so a
-dependency change starts a fresh cache instead of growing a stale one. It is only written from the default branch,
-and is read by all branches.
+dependency change starts a fresh cache instead of growing a stale one.
 
 For repos with multiple apps, list each app's folder at the repo root in a matrix. The folder name becomes
 the image suffix, and `<folder>/Dockerfile` is built with the repo root as context.
