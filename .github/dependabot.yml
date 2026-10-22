@@ -1,7 +1,10 @@
 version: 2
 updates:
   - package-ecosystem: github-actions
-    directory: /
+    directories:
+      - /
+      - /actions/dependency-cache/restore
+      - /actions/dependency-cache/save
     schedule:
       interval: weekly
       day: monday

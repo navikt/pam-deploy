@@ -1,0 +1,10 @@
+name: 'Save dependency cache'
+description: 'Saves the dependencies found by dependency-cache/restore.'
+runs:
+  using: 'composite'
+  steps:
+    - uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      if: env.DEPENDENCY_CACHE_PATHS != '' && env.DEPENDENCY_CACHE_HIT != 'true'
+      with:
+        path: ${{ env.DEPENDENCY_CACHE_PATHS }}
+        key: ${{ env.DEPENDENCY_CACHE_KEY }}

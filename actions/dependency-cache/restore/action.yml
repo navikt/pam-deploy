@@ -1,0 +1,40 @@
+name: 'Restore dependency cache'
+description: 'Restores cached Gradle, Maven and pnpm dependencies. Use with dependency-cache/save after the build.'
+inputs:
+  working_directory:
+    description: 'The directory the build runs in'
+    required: false
+    default: '.'
+runs:
+  using: 'composite'
+  steps:
+    - name: Find dependency cache paths
+      shell: bash
+      working-directory: ${{ inputs.working_directory }}
+      env:
+        GRADLE: ${{ hashFiles('**/gradlew') }}
+        MAVEN: ${{ hashFiles('**/pom.xml') }}
+        PNPM: ${{ hashFiles('**/pnpm-lock.yaml') }}
+        BUILD_FILES_HASH: ${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties', 'gradle/*.versions.toml', '**/pom.xml', '**/.mvn/wrapper/maven-wrapper.properties', '**/.mvn/extensions.xml', '**/pnpm-lock.yaml') }}
+      run: |
+        {
+          echo "DEPENDENCY_CACHE_KEY=dependencies-${RUNNER_OS}-${RUNNER_ARCH}-${BUILD_FILES_HASH}"
+          echo "DEPENDENCY_CACHE_PATHS<<EOF"
+          if [ -n "$GRADLE" ]; then printf '%s\n' ~/.gradle/caches ~/.gradle/wrapper; fi
+          if [ -n "$MAVEN" ]; then printf '%s\n' ~/.m2/repository ~/.m2/wrapper/dists; fi
+          if [ -n "$PNPM" ]; then
+            pnpm store path --silent
+            pnpm cache path --silent 2>/dev/null || true
+          fi
+          echo "EOF"
+        } >> "$GITHUB_ENV"
+    - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      id: restore
+      if: env.DEPENDENCY_CACHE_PATHS != ''
+      with:
+        path: ${{ env.DEPENDENCY_CACHE_PATHS }}
+        key: ${{ env.DEPENDENCY_CACHE_KEY }}
+    - name: Mark dependency cache as hit
+      if: steps.restore.outputs.cache-hit == 'true'
+      shell: bash
+      run: echo "DEPENDENCY_CACHE_HIT=true" >> "$GITHUB_ENV"
