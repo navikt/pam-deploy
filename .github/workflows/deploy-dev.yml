@@ -134,6 +134,8 @@ jobs:
           IMAGE_SUFFIX: ${{ inputs.IMAGE_SUFFIX }}
           DRAFTS_MAX: ${{ inputs.DRAFTS_MAX }}
           VERSION_TAG: ${{ inputs.VERSION_TAG }}
+      - name: Record image build time
+        run: echo "IMAGE_BUILD_TIME=$(TZ=Europe/Oslo date +'%Y-%m-%d %H:%M:%S %Z')" >> "$GITHUB_ENV"
       - name: docker-build-push
         uses: nais/docker-build-push@v0
         id: docker-build-push
@@ -180,6 +182,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION_TAG: ${{ env.VERSION_TAG }}
           DRAFT_NAME: ${{ env.DRAFT_NAME }}
+          IMAGE_BUILD_TIME: ${{ env.IMAGE_BUILD_TIME }}
         run: |
           notes_file="$(mktemp)"
           previous_ref="$(gh api "repos/$GITHUB_REPOSITORY/releases/latest" --jq '.tag_name' 2>/dev/null || true)"
@@ -189,6 +192,7 @@ jobs:
           {
             echo "[$VERSION_TAG](https://github.com/$GITHUB_REPOSITORY/tree/$VERSION_TAG)"
             echo "[Full Changelog](https://github.com/$GITHUB_REPOSITORY/compare/$previous_ref...$VERSION_TAG)"
+            echo "Image built: $IMAGE_BUILD_TIME"
             git log "$previous_ref..$GITHUB_SHA" --no-merges --pretty=format:'* %ad %s' -50 --date=short | sed '/^[[:space:]]*$/d'
           } > "$notes_file"
           if gh release view "$VERSION_TAG" >/dev/null 2>&1; then
