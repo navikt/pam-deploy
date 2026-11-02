@@ -39,7 +39,7 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
       - name: Setup CodeQL
-        uses: github/codeql-action/init@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4.39.0
+        uses: github/codeql-action/init@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4.39.1
         with:
           languages: ${{ (inputs.LANGUAGE == 'node' && 'javascript') || inputs.LANGUAGE }}
           queries: security-and-quality
@@ -80,6 +80,6 @@ jobs:
         if: ${{ inputs.LANGUAGE == 'java' && inputs.BUILD_CACHE == 'maven'}}
         uses: advanced-security/maven-dependency-submission-action@a64327a7329c9939cf675e458452febe1894a70c # v6.0.1
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4.39.0
+        uses: github/codeql-action/analyze@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4.39.1
         with:
           category: "/language:${{ (inputs.LANGUAGE == 'node' && 'javascript') || inputs.LANGUAGE }}"
